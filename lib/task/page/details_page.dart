@@ -17,6 +17,8 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   final TextEditingController _newTitle = TextEditingController();
   final TextEditingController _newDescription = TextEditingController();
+  final TextEditingController _newPin = TextEditingController();
+  final TextEditingController _newDate = TextEditingController();
   bool toggleSwitch = false;
   String selectedStatus = 'Pending';
   final List<String> statusOptions = [
@@ -107,6 +109,13 @@ class _DetailsPageState extends State<DetailsPage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext cx) {
+                          _newTitle.text = currentTodo.title;
+                          _newDescription.text = currentTodo.description;
+                          _newPin.text = currentTodo.pin.toString();
+                          _newDate.text =
+                              DateFormat.yMMMEd().format(currentTodo.date);
+                          selectedStatus = currentTodo.status;
+
                           return StatefulBuilder(
                             builder: ((context, setState) {
                               return AlertDialog(
@@ -179,6 +188,62 @@ class _DetailsPageState extends State<DetailsPage> {
                                     const SizedBox(height: 10),
                                     const Align(
                                       alignment: Alignment.topLeft,
+                                      child: Text('Pin'),
+                                    ),
+                                    Flexible(
+                                      child: TextFormField(
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          border: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.blue),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                        ),
+                                        maxLines: 1,
+                                        controller: _newPin,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text('Date'),
+                                    ),
+                                    Flexible(
+                                      child: TextFormField(
+                                        controller: _newDate,
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          border: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.blue),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[200],
+                                        ),
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Align(
+                                      alignment: Alignment.topLeft,
                                       child: Text('Status'),
                                     ),
                                     DropdownButton<String>(
@@ -219,6 +284,11 @@ class _DetailsPageState extends State<DetailsPage> {
                                                 number: currentTodo.number,
                                                 title: _newTitle.text,
                                                 status: selectedStatus,
+                                                pin: int.parse(_newPin.text) ??
+                                                    0,
+                                                date: DateFormat.yMMMEd()
+                                                        .parse(_newDate.text) ??
+                                                    DateTime.now(),
                                               ),
                                             ),
                                           );

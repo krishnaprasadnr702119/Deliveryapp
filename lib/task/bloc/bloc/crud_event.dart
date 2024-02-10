@@ -10,7 +10,9 @@ class AddTodo extends CrudEvent {
   final int number;
   final String description;
   final DateTime createdTime;
-  final String status; // Include status
+  final String status;
+  final int pin;
+  final DateTime date;
 
   const AddTodo({
     required this.title,
@@ -19,11 +21,13 @@ class AddTodo extends CrudEvent {
     required this.description,
     required this.createdTime,
     required this.status,
+    required this.pin,
+    required this.date,
   });
 
   @override
   List<Object?> get props =>
-      [title, isImportant, number, description, createdTime, status];
+      [title, isImportant, number, description, createdTime, status, pin, date];
 }
 
 class UpdateTodo extends CrudEvent {

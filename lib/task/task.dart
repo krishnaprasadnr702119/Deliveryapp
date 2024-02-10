@@ -22,10 +22,10 @@ class TaskPage extends StatelessWidget {
           children: [
             UserAccountsDrawerHeader(
               accountName: user != null
-                  ? Text(user!.username, style: TextStyle(color: Colors.black))
+                  ? Text(user!.username, style: TextStyle(color: Colors.white))
                   : null,
               accountEmail: user != null
-                  ? Text(user!.email, style: TextStyle(color: Colors.black))
+                  ? Text(user!.email, style: TextStyle(color: Colors.white))
                   : null,
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,

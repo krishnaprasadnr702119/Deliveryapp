@@ -39,8 +39,9 @@ class AppDatabase {
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     time TEXT NOT NULL,
-    status TEXT NOT NULL 
-    
+    status TEXT NOT NULL,  
+    pin INTEGER NOT NULL,
+    date TEXT NOT NULL
   )
 ''');
     } catch (e) {
@@ -156,6 +157,8 @@ class AppDatabase {
         TodoFields.description: todo.description,
         TodoFields.time: todo.createdTime.toIso8601String(),
         TodoFields.status: todo.status,
+        TodoFields.pin: todo.pin,
+        TodoFields.date: todo.date.toIso8601String(),
       },
       where: '${TodoFields.id} = ?',
       whereArgs: [todo.id],

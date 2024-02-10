@@ -1,8 +1,18 @@
+import 'package:intl/intl.dart';
+
 const String todoTable = 'todos';
 
 class TodoFields {
   static final List<String> values = [
-    id, isImportant, number, title, description, time, status // Add status
+    id,
+    isImportant,
+    number,
+    title,
+    description,
+    time,
+    status,
+    pin,
+    date,
   ];
 
   static const String id = '_id';
@@ -11,7 +21,9 @@ class TodoFields {
   static const String title = 'title';
   static const String description = 'description';
   static const String time = 'time';
-  static const String status = 'status'; // Add status
+  static const String status = 'status';
+  static const String pin = 'pin';
+  static const String date = 'date';
 }
 
 class Todo {
@@ -21,16 +33,20 @@ class Todo {
   final String title;
   final String description;
   final DateTime createdTime;
-  final String status; // Add status
+  final String status;
+  final int pin;
+  final DateTime date;
 
-  const Todo({
+  Todo({
     this.id,
     required this.isImportant,
     required this.number,
     required this.title,
     required this.description,
     required this.createdTime,
-    required this.status, // Include status
+    required this.status,
+    required this.pin,
+    required this.date,
   });
 
   Todo copyWith({
@@ -41,6 +57,8 @@ class Todo {
     String? description,
     DateTime? createdTime,
     String? status,
+    int? pin,
+    DateTime? date,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -50,19 +68,27 @@ class Todo {
       description: description ?? this.description,
       createdTime: createdTime ?? this.createdTime,
       status: status ?? this.status,
+      pin: pin ?? this.pin,
+      date: date ?? this.date,
     );
   }
 
-  static Todo fromJson(Map<String, Object?> json) => Todo(
-        id: json[TodoFields.id] as int?,
-        isImportant: json[TodoFields.isImportant] == 1,
-        number: json[TodoFields.number] as int,
-        title: json[TodoFields.title] as String,
-        description: json[TodoFields.description] as String,
-        createdTime: DateTime.parse(json[TodoFields.time] as String),
-        status: json[TodoFields.status] as String, // Include status
-      );
+  /// Deserialize from JSON
+  static Todo fromJson(Map<String, Object?> json) {
+    return Todo(
+      id: json[TodoFields.id] as int?,
+      isImportant: json[TodoFields.isImportant] == 1,
+      number: json[TodoFields.number] as int,
+      title: json[TodoFields.title] as String,
+      description: json[TodoFields.description] as String,
+      createdTime: DateTime.parse(json[TodoFields.time] as String),
+      status: json[TodoFields.status] as String,
+      pin: json[TodoFields.pin] != null ? (json[TodoFields.pin] as int) : 0,
+      date: _parseDate(json[TodoFields.date]),
+    );
+  }
 
+  /// Serialize to JSON
   Map<String, Object?> toJson() => {
         TodoFields.id: id,
         TodoFields.title: title,
@@ -70,6 +96,25 @@ class Todo {
         TodoFields.number: number,
         TodoFields.description: description,
         TodoFields.time: createdTime.toIso8601String(),
-        TodoFields.status: status, // Include status
+        TodoFields.status: status,
+        TodoFields.pin: pin,
+        TodoFields.date: DateFormat('MM/dd/yy').format(date),
       };
+
+  /// Helper method to parse date with custom format and error handling
+  static DateTime _parseDate(dynamic dateString) {
+    try {
+      if (dateString is String) {
+        return DateFormat('MM/dd/yy').parse(dateString);
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
+    return DateTime.now();
+  }
+
+  /// Validate the Todo object
+  bool isValid() {
+    return pin >= 0 && date.isAfter(DateTime.now());
+  }
 }

@@ -17,8 +17,9 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
           isImportant: event.isImportant,
           number: event.number,
           title: event.title,
-          status:
-              'Pending', // Provide a default status or get it from your event
+          status: 'Pending',
+          pin: event.pin,
+          date: event.date,
         ),
       );
     });
