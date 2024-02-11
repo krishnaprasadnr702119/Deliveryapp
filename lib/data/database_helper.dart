@@ -53,7 +53,7 @@ class AppDatabase {
     await initDatabase();
 
     if (_database != null) {
-      print("Saving user: ${user.toMap()}");
+      //  print("Saving user: ${user.toMap()}");
 
       if (resetPassword) {
         await _database!.update(
@@ -116,7 +116,7 @@ class AppDatabase {
   Future<Todo> create(Todo todo) async {
     final db = await _database;
     final id = await db!.insert(todoTable, todo.toJson());
-
+    print(todo);
     return todo.copyWith(id: id, status: todo.status);
   }
 

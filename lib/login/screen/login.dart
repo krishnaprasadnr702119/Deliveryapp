@@ -17,14 +17,12 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blue,
-              Colors.green
-            ], // Change these colors as needed
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage('assets/background.jpg'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Center(
@@ -54,30 +52,30 @@ class LoginPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    Image.asset('assets/amazon.png', height: 280, width: 360),
+                    Image.asset('assets/logo.png', height: 400, width: 260),
                     SizedBox(height: 16),
                     TextField(
                       controller: _usernameController,
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Username',
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: TextStyle(color: Colors.white),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: BorderSide(color: Colors.white),
                         ),
                       ),
                     ),
                     SizedBox(height: 16),
                     TextField(
                       controller: _passwordController,
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: TextStyle(color: Colors.white),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.black),
+                          borderSide: BorderSide(color: Colors.white),
                         ),
                       ),
                       obscureText: true,

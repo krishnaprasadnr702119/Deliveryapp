@@ -46,6 +46,12 @@ class _DetailsPageState extends State<DetailsPage> {
       body: Container(
         padding: const EdgeInsets.all(8),
         height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: BlocBuilder<CrudBloc, CrudState>(
           builder: (context, state) {
             if (state is DisplaySpecificTodo) {
@@ -292,7 +298,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           );
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
-                                        backgroundColor: Constants.primaryColor,
+                                        backgroundColor: Colors.green,
                                         duration: Duration(seconds: 1),
                                         content: Text('Task updated'),
                                       ));

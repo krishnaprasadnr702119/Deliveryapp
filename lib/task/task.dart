@@ -6,6 +6,7 @@ import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
+import 'package:task/task/widgets/filter.dart';
 
 class TaskPage extends StatefulWidget {
   final User? user;
@@ -27,7 +28,17 @@ class _TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[100],
         title: Text('Delivery'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () {
+              print('Filtering tasks...');
+              showFilterPopup(context);
+            },
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -48,14 +59,6 @@ class _TaskPageState extends State<TaskPage> {
               ),
               margin: EdgeInsets.zero,
               currentAccountPictureSize: Size.square(72),
-            ),
-            ListTile(
-              title: Text('', style: TextStyle(color: Colors.black)),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('', style: TextStyle(color: Colors.black)),
-              onTap: () {},
             ),
             ListTile(
               title: Text('Logout', style: TextStyle(color: Colors.black)),
@@ -87,6 +90,12 @@ class _TaskPageState extends State<TaskPage> {
             child: Container(
               padding: const EdgeInsets.all(8),
               height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/background.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
               child: Column(
                 children: [
                   SingleChildScrollView(
@@ -209,10 +218,12 @@ class _TaskPageState extends State<TaskPage> {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  content: Text("Deleted todo"),
-                                                ),
+                                                    duration: Duration(
+                                                        milliseconds: 500),
+                                                    content:
+                                                        Text("Deleted Task"),
+                                                    backgroundColor:
+                                                        Colors.green),
                                               );
                                             },
                                             icon: const Icon(

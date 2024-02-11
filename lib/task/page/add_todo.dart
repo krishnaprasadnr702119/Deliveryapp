@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart'; // Import the intl package for date formatting
@@ -19,10 +21,24 @@ class _AddTodoPageState extends State<AddTodoPage> {
   String selectedStatus = 'Pending';
 
   @override
+  void initState() {
+    super.initState();
+    _generateRandomPin();
+  }
+
+  void _generateRandomPin() {
+    // Generate a random 4-digit pin
+    Random random = Random();
+    int randomPin = random.nextInt(9000) + 1000;
+    _pinController.text = randomPin.toString();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.blue[100],
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -34,12 +50,19 @@ class _AddTodoPageState extends State<AddTodoPage> {
           child: Container(
             padding: const EdgeInsets.all(16),
             height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomText(text: 'order'.toUpperCase()),
                 TextFormField(
                   controller: _title,
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -50,6 +73,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 CustomText(text: 'location'.toUpperCase()),
                 TextFormField(
                   controller: _description,
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -60,6 +84,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 CustomText(text: 'Pin'.toUpperCase()),
                 TextFormField(
                   controller: _pinController,
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -69,6 +94,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 CustomText(text: 'date'.toUpperCase()),
                 TextFormField(
                   controller: _dateController,
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -127,9 +153,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    duration: Duration(seconds: 1),
-                                    content: Text("Task successfully"),
-                                  ),
+                                      duration: Duration(seconds: 1),
+                                      content: Text("Task successfully"),
+                                      backgroundColor: Colors.green),
                                 );
                                 context
                                     .read<CrudBloc>()
@@ -137,21 +163,17 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                 Navigator.pop(context);
                               } else {
                                 print("Invalid date: $parsedDate");
-                                // Handle case where parsedDate is not valid
-                                // You may want to show an error message or take appropriate action
                               }
                             } catch (e) {
                               print("Error parsing date: $e");
-                              // Handle the error when parsing the date
-                              // Provide a default date or handle the error as needed
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  "All fields must be filled",
-                                ),
-                              ),
+                                  content: Text(
+                                    "All fields must be filled",
+                                  ),
+                                  backgroundColor: Colors.green),
                             );
                           }
                         },
