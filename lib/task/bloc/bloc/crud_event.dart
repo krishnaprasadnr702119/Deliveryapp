@@ -65,3 +65,12 @@ class DeleteTodo extends CrudEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class FetchTasksByStatus extends CrudEvent {
+  final String status;
+
+  const FetchTasksByStatus({required this.status});
+
+  @override
+  List<Object?> get props => [status];
+}

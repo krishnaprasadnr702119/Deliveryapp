@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task/login/screen/login.dart';
 import 'package:task/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
+import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
 
-class TaskPage extends StatelessWidget {
+class TaskPage extends StatefulWidget {
   final User? user;
 
   const TaskPage({Key? key, this.user}) : super(key: key);
+
+  @override
+  _TaskPageState createState() => _TaskPageState();
+}
+
+class _TaskPageState extends State<TaskPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CrudBloc>().add(const FetchTodos());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,26 +34,37 @@ class TaskPage extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: user != null
-                  ? Text(user!.username, style: TextStyle(color: Colors.white))
+              accountName: widget.user != null
+                  ? Text(widget.user!.username,
+                      style: TextStyle(color: Colors.white))
                   : null,
-              accountEmail: user != null
-                  ? Text(user!.email, style: TextStyle(color: Colors.white))
+              accountEmail: widget.user != null
+                  ? Text(widget.user!.email,
+                      style: TextStyle(color: Colors.white))
                   : null,
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Text(user?.username.substring(0, 1) ?? ''),
+                child: Text(widget.user?.username.substring(0, 1) ?? ''),
               ),
               margin: EdgeInsets.zero,
               currentAccountPictureSize: Size.square(72),
             ),
             ListTile(
-              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              title: Text('', style: TextStyle(color: Colors.black)),
               onTap: () {},
             ),
             ListTile(
-              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              title: Text('', style: TextStyle(color: Colors.black)),
               onTap: () {},
+            ),
+            ListTile(
+              title: Text('Logout', style: TextStyle(color: Colors.black)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (c) => LoginPage()),
+                );
+              },
             ),
           ],
         ),
@@ -59,123 +83,159 @@ class TaskPage extends StatelessWidget {
       ),
       body: BlocBuilder<CrudBloc, CrudState>(
         builder: (context, state) {
-          if (state is CrudInitial) {
-            context.read<CrudBloc>().add(const FetchTodos());
-          }
-          if (state is DisplayTodos) {
-            return SafeArea(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children: [
-                    Center(
-                      child: Text(
-                        'Add Task'.toUpperCase(),
-                        style: const TextStyle(fontSize: 16),
-                      ),
+          return SafeArea(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<CrudBloc>().add(const FetchTodos());
+                          },
+                          child: const Text('All Tasks'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<CrudBloc>()
+                                .add(FetchTasksByStatus(status: 'Completed'));
+                          },
+                          child: const Text('Completed Tasks'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<CrudBloc>()
+                                .add(FetchTasksByStatus(status: 'Pending'));
+                          },
+                          child: const Text('Pending Tasks'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<CrudBloc>()
+                                .add(FetchTasksByStatus(status: 'Started'));
+                          },
+                          child: const Text('Started Tasks'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<CrudBloc>()
+                                .add(FetchTasksByStatus(status: 'Paused'));
+                          },
+                          child: const Text('Paused Tasks'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    state.todo.isNotEmpty
-                        ? Expanded(
-                            child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              padding: const EdgeInsets.all(8),
-                              itemCount: state.todo.length,
-                              itemBuilder: (context, i) {
-                                Color statusColor = Colors.white;
+                  ),
+                  if (state is DisplayTodos && state.todo.isNotEmpty)
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: state.todo.length,
+                        itemBuilder: (context, i) {
+                          Todo currentTodo = state.todo[i];
+                          Color statusColor = Colors.white;
 
-                                if (state.todo[i].status == 'Completed') {
-                                  statusColor = Colors.green;
-                                } else if (state.todo[i].status == 'Started') {
-                                  statusColor = Colors.yellow;
-                                } else if (state.todo[i].status == 'Paused') {
-                                  statusColor = Colors.orange;
-                                } else if (state.todo[i].status == 'Pending') {
-                                  statusColor = Colors.red;
-                                }
+                          if (currentTodo.status == 'Completed') {
+                            statusColor = Colors.green;
+                          } else if (currentTodo.status == 'Started') {
+                            statusColor = Colors.yellow;
+                          } else if (currentTodo.status == 'Paused') {
+                            statusColor = Colors.orange;
+                          } else if (currentTodo.status == 'Pending') {
+                            statusColor = Colors.blue;
+                          }
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    context.read<CrudBloc>().add(
-                                        FetchSpecificTodo(
-                                            id: state.todo[i].id!));
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: ((context) =>
-                                            const DetailsPage()),
+                          return GestureDetector(
+                            onTap: () {
+                              context
+                                  .read<CrudBloc>()
+                                  .add(FetchSpecificTodo(id: currentTodo.id!));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) => const DetailsPage()),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 80,
+                              margin: const EdgeInsets.only(bottom: 14),
+                              child: Card(
+                                elevation: 10,
+                                color: statusColor,
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        currentTodo.title.toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 80,
-                                    margin: const EdgeInsets.only(bottom: 14),
-                                    child: Card(
-                                      elevation: 10,
-                                      color: statusColor,
-                                      child: Column(
+                                      subtitle: Text(
+                                        'Status: ${currentTodo.status}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          ListTile(
-                                            title: Text(
-                                              state.todo[i].title.toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              'Status: ${state.todo[i].status}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            trailing: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    context
-                                                        .read<CrudBloc>()
-                                                        .add(DeleteTodo(
-                                                            id: state
-                                                                .todo[i].id!));
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      const SnackBar(
-                                                        duration: Duration(
-                                                            milliseconds: 500),
-                                                        content: Text(
-                                                            "Deleted todo"),
-                                                      ),
-                                                    );
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
-                                                  ),
+                                          IconButton(
+                                            onPressed: () {
+                                              context.read<CrudBloc>().add(
+                                                  DeleteTodo(
+                                                      id: currentTodo.id!));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  duration: Duration(
+                                                      milliseconds: 500),
+                                                  content: Text("Deleted todo"),
                                                 ),
-                                              ],
+                                              );
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  ],
+                                ),
+                              ),
                             ),
-                          )
-                        : const Text(''),
-                  ],
-                ),
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    const Text('No tasks'),
+                ],
               ),
-            );
-          }
-          return Container(
-            color: Colors.white,
-            child: const Center(child: CircularProgressIndicator()),
+            ),
           );
         },
       ),

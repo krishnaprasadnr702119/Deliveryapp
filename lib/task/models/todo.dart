@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 
 const String todoTable = 'todos';
@@ -74,22 +76,28 @@ class Todo {
   }
 
   /// Deserialize from JSON
-  static Todo fromJson(Map<String, Object?> json) {
+  factory Todo.fromJson(String jsonString) {
+    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    return Todo.fromMap(jsonMap);
+  }
+
+  /// Deserialize from Map
+  factory Todo.fromMap(Map<String, dynamic> map) {
     return Todo(
-      id: json[TodoFields.id] as int?,
-      isImportant: json[TodoFields.isImportant] == 1,
-      number: json[TodoFields.number] as int,
-      title: json[TodoFields.title] as String,
-      description: json[TodoFields.description] as String,
-      createdTime: DateTime.parse(json[TodoFields.time] as String),
-      status: json[TodoFields.status] as String,
-      pin: json[TodoFields.pin] != null ? (json[TodoFields.pin] as int) : 0,
-      date: _parseDate(json[TodoFields.date]),
+      id: map[TodoFields.id] as int?,
+      isImportant: map[TodoFields.isImportant] == 1,
+      number: map[TodoFields.number] as int,
+      title: map[TodoFields.title] as String,
+      description: map[TodoFields.description] as String,
+      createdTime: DateTime.parse(map[TodoFields.time] as String),
+      status: map[TodoFields.status] as String,
+      pin: map[TodoFields.pin] != null ? (map[TodoFields.pin] as int) : 0,
+      date: _parseDate(map[TodoFields.date]),
     );
   }
 
   /// Serialize to JSON
-  Map<String, Object?> toJson() => {
+  Map<String, dynamic> toJson() => {
         TodoFields.id: id,
         TodoFields.title: title,
         TodoFields.isImportant: isImportant ? 1 : 0,

@@ -24,3 +24,11 @@ class DisplaySpecificTodo extends CrudState {
   @override
   List<Object> get props => [todo];
 }
+
+class DisplayFilteredTodos extends CrudState {
+  final List<Todo> filteredTodos;
+
+  const DisplayFilteredTodos({required this.filteredTodos});
+  @override
+  List<Object> get props => [filteredTodos];
+}

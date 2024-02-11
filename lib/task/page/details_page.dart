@@ -284,11 +284,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                                 number: currentTodo.number,
                                                 title: _newTitle.text,
                                                 status: selectedStatus,
-                                                pin: int.parse(_newPin.text) ??
-                                                    0,
+                                                pin: int.parse(_newPin.text),
                                                 date: DateFormat.yMMMEd()
-                                                        .parse(_newDate.text) ??
-                                                    DateTime.now(),
+                                                    .parse(_newDate.text),
                                               ),
                                             ),
                                           );
@@ -299,7 +297,6 @@ class _DetailsPageState extends State<DetailsPage> {
                                         content: Text('Task updated'),
                                       ));
 
-                                      // Navigate to TaskPage after updating the task
                                       Navigator.popUntil(
                                           context, (route) => route.isFirst);
                                       context

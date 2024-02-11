@@ -131,7 +131,7 @@ class AppDatabase {
     );
 
     if (maps.isNotEmpty) {
-      return Todo.fromJson(maps.first);
+      return Todo.fromMap(maps.first);
     } else {
       throw Exception('ID $id not found');
     }
@@ -142,7 +142,7 @@ class AppDatabase {
     const orderBy = '${TodoFields.time} ASC';
     final result = await db!.query(todoTable, orderBy: orderBy);
 
-    return result.map((json) => Todo.fromJson(json)).toList();
+    return result.map((json) => Todo.fromMap(json)).toList();
   }
 
   Future<int> update({required Todo todo}) async {
@@ -179,5 +179,17 @@ class AppDatabase {
     final db = await _database;
 
     db!.close();
+  }
+
+  Future<List<Todo>> readTodosByStatus(String status) async {
+    final List<Map<String, Object?>>? maps = await _database?.query(
+      'todos',
+      where: 'status = ?',
+      whereArgs: [status],
+    );
+
+    return List.generate(maps!.length, (i) {
+      return Todo.fromMap(maps[i]);
+    });
   }
 }

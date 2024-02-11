@@ -44,5 +44,10 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
       await AppDatabase().delete(id: event.id);
       add(const FetchTodos());
     });
+
+    on<FetchTasksByStatus>((event, emit) async {
+      List<Todo> tasks = await AppDatabase().readTodosByStatus(event.status);
+      emit(DisplayTodos(todo: tasks));
+    });
   }
 }
