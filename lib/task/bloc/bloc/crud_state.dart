@@ -32,3 +32,11 @@ class DisplayFilteredTodos extends CrudState {
   @override
   List<Object> get props => [filteredTodos];
 }
+
+class GoogleMapsOpened extends CrudState {
+  final String location;
+
+  const GoogleMapsOpened({required this.location});
+  @override
+  List<Object> get props => [location];
+}

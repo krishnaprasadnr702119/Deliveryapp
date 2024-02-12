@@ -1,6 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:task/data/database_helper.dart';
+import 'package:task/task/models/userloction.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/todo.dart';
 
 part 'crud_event.dart';
@@ -49,5 +52,20 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
       List<Todo> tasks = await AppDatabase().readTodosByStatus(event.status);
       emit(DisplayTodos(todo: tasks));
     });
+
+    on<OpenGoogleMapsEvent>((event, emit) async {
+      await openGoogleMaps(event.location);
+    });
+  }
+
+  Future<void> openGoogleMaps(String location) async {
+    final String googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$location';
+
+    if (await canLaunch(googleMapsUrl)) {
+      await launch(googleMapsUrl);
+    } else {
+      throw 'Could not open Google Maps.';
+    }
   }
 }

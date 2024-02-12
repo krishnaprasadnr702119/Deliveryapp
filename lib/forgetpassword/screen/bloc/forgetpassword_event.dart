@@ -1,5 +1,3 @@
-// lib/forgetpassword/screen/bloc/forgetpassword_event.dart
-
 part of 'forgetpassword_bloc.dart';
 
 abstract class ForgetPasswordEvent {}

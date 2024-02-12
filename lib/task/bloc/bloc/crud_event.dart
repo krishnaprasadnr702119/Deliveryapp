@@ -33,12 +33,32 @@ class AddTodo extends CrudEvent {
 class UpdateTodo extends CrudEvent {
   final Todo todo;
 
-  const UpdateTodo({required this.todo});
+  const UpdateTodo({
+    required this.todo,
+  });
 
   @override
   List<Object?> get props => [todo];
 
   get status => null;
+
+  // Nested OpenGoogleMapsEvent
+  OpenGoogleMapsEvent openGoogleMapsEvent({
+    required String location,
+  }) {
+    return OpenGoogleMapsEvent(location: location);
+  }
+}
+
+class OpenGoogleMapsEvent extends CrudEvent {
+  final String location;
+
+  const OpenGoogleMapsEvent({
+    required this.location,
+  });
+
+  @override
+  List<Object?> get props => [location];
 }
 
 class FetchTodos extends CrudEvent {

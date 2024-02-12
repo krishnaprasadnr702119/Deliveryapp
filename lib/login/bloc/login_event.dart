@@ -1,5 +1,3 @@
-// login_event.dart
-
 part of 'login_bloc.dart';
 
 @immutable

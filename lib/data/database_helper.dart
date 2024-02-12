@@ -1,7 +1,14 @@
+import 'dart:convert';
+
+import 'package:geolocator/geolocator.dart';
+import 'package:password_hash_plus/password_hash_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:task/models/user.dart';
+import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
+import 'package:task/task/models/userloction.dart';
 
 class AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();
@@ -49,13 +56,18 @@ class AppDatabase {
     }
   }
 
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final hash = sha256.convert(bytes);
+    return hash.toString();
+  }
+
   Future<void> saveUser(User user, {bool resetPassword = false}) async {
     await initDatabase();
 
     if (_database != null) {
-      //  print("Saving user: ${user.toMap()}");
-
       if (resetPassword) {
+        user = user.copyWith(password: _hashPassword(user.password));
         await _database!.update(
           'users',
           user.toMap(),
@@ -63,6 +75,7 @@ class AppDatabase {
           whereArgs: [user.email],
         );
       } else {
+        user = user.copyWith(password: _hashPassword(user.password));
         await _database!.insert(
           'users',
           user.toMap(),
@@ -86,7 +99,7 @@ class AppDatabase {
       if (result.isNotEmpty) {
         final User user = User.fromMap(result.first);
 
-        if (user.password == password) {
+        if (user.password == _hashPassword(password)) {
           return user;
         }
       }
@@ -116,7 +129,6 @@ class AppDatabase {
   Future<Todo> create(Todo todo) async {
     final db = await _database;
     final id = await db!.insert(todoTable, todo.toJson());
-    print(todo);
     return todo.copyWith(id: id, status: todo.status);
   }
 

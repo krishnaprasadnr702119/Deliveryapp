@@ -1,5 +1,3 @@
-// login_bloc.dart
-
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:task/data/database_helper.dart';

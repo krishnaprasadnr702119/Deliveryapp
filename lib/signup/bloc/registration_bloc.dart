@@ -1,5 +1,3 @@
-// registration_bloc.dart
-
 import 'package:bloc/bloc.dart';
 import 'package:task/data/database_helper.dart';
 import 'package:task/models/user.dart';

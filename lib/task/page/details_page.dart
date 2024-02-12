@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/task.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../constants/constants.dart';
 import '../models/todo.dart';
 import '../widgets/custom_text.dart';
@@ -279,6 +281,13 @@ class _DetailsPageState extends State<DetailsPage> {
                                   ElevatedButton(
                                     style: Constants.customButtonStyle,
                                     onPressed: () async {
+                                      if (selectedStatus == 'Started') {
+                                        context.read<CrudBloc>().add(
+                                            OpenGoogleMapsEvent(
+                                                location:
+                                                    _newDescription.text));
+                                      }
+
                                       context.read<CrudBloc>().add(
                                             UpdateTodo(
                                               todo: Todo(

@@ -1,5 +1,3 @@
-// registration_state.dart
-
 part of 'registration_bloc.dart';
 
 abstract class RegistrationState {}
