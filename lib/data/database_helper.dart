@@ -1,14 +1,10 @@
 import 'dart:convert';
-
-import 'package:geolocator/geolocator.dart';
 import 'package:password_hash_plus/password_hash_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:task/models/user.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
-import 'package:task/task/models/userloction.dart';
 
 class AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();

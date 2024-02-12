@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:task/data/database_helper.dart';
-import 'package:task/task/models/userloction.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/todo.dart';
 
