@@ -28,17 +28,21 @@ class _TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue[100],
-        title: Text('Delivery'),
+        backgroundColor: Colors.black,
+        title: Text(
+          'Delivery',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(Icons.filter_list, color: Colors.white),
             onPressed: () {
               print('Filtering tasks...');
               showFilterPopup(context);
             },
           ),
         ],
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       drawer: Drawer(
         child: ListView(

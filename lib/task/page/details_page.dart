@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/task.dart';
+import 'package:task/task/widgets/dropdown_util.dart';
 
 import '../constants/constants.dart';
 import '../models/todo.dart';
@@ -35,10 +36,9 @@ class _DetailsPageState extends State<DetailsPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-          ),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             context.read<CrudBloc>().add(const FetchTodos());
             Navigator.pop(context);
@@ -201,8 +201,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                       ),
                                       Flexible(
                                         child: TextFormField(
-                                          obscureText:
-                                              true, // Add this line to obscure the PIN
+                                          obscureText: true,
                                           decoration: InputDecoration(
                                             isDense: true,
                                             border: OutlineInputBorder(
@@ -264,12 +263,8 @@ class _DetailsPageState extends State<DetailsPage> {
                                             selectedStatus = newValue!;
                                           });
                                         },
-                                        items: statusOptions.map((status) {
-                                          return DropdownMenuItem<String>(
-                                            value: status,
-                                            child: Text(status),
-                                          );
-                                        }).toList(),
+                                        items: getDropdownItems(
+                                            currentTodo.status),
                                       ),
                                     ],
                                   ),
