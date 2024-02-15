@@ -1,56 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task/task/bloc/bloc/crud_bloc.dart';
 
-void showFilterPopup(BuildContext context) async {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Filter Options'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  DateTime? selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-
-                  if (selectedDate != null) {
-                    // Handle the selected created date
-                    print('Selected Created Date: $selectedDate');
-                  }
+class Filter {
+  static Future<void> showFilterOptionsPopup(
+      BuildContext context, DateTime selectedDate) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Filter Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Handle filtering by created date
+                  context.read<CrudBloc>().add(const FetchTasksByStatus(
+                        status: 'Filter by created date',
+                      ));
                 },
-                child: Text('Filter by Created Date'),
+                child: const Text('Filter by Created Date'),
               ),
-            ),
-            SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  DateTime? selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-
-                  if (selectedDate != null) {
-                    // Handle the selected completed date
-                    print('Selected Completed Date: $selectedDate');
-                  }
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Handle filtering by complete date
+                  context.read<CrudBloc>().add(const FetchTasksByStatus(
+                        status: 'Filter by complete date',
+                      ));
                 },
-                child: Text('Filter by Completed Date'),
+                child: const Text('Filter by Complete Date'),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Fetch tasks for the selected date in ascending order
+                  context.read<CrudBloc>().add(FetchTasksByDate(
+                        selectedDate: selectedDate,
+                      ));
+                },
+                child: const Text('Filter by Date (Ascending Order)'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

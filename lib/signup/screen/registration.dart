@@ -124,6 +124,7 @@ class RegistrationForm extends StatelessWidget {
                               confirmPassword.isNotEmpty) {
                             if (password == confirmPassword) {
                               User user = User(
+                                id: User.generateUserId(),
                                 email: email,
                                 username: username,
                                 password: password,

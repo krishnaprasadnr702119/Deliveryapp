@@ -10,6 +10,8 @@ List<DropdownMenuItem<String>> getDropdownItems(String currentStatus) {
     allowedStatusOptions = ['Pending', 'Started'];
   } else if (currentStatus == 'Started') {
     allowedStatusOptions = ['Started', 'Paused', 'Completed'];
+  } else if (currentStatus == 'Paused') {
+    allowedStatusOptions = ['Completed', 'Paused'];
   }
 
   return allowedStatusOptions.map((status) {

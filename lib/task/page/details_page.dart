@@ -59,6 +59,7 @@ class _DetailsPageState extends State<DetailsPage> {
             if (state is DisplaySpecificTodo) {
               Todo currentTodo = state.todo;
               originalPin = currentTodo.pin;
+
               return Column(
                 children: [
                   CustomText(text: 'title'.toUpperCase()),
@@ -111,6 +112,18 @@ class _DetailsPageState extends State<DetailsPage> {
                   CustomText(
                     text: DateFormat.yMMMEd().format(state.todo.createdTime),
                   ),
+                  if (currentTodo.completedDate != null)
+                    Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        CustomText(
+                            text: 'Expected delivery date'.toUpperCase()),
+                        const SizedBox(height: 10),
+                        CustomText(
+                          text: DateFormat.yMMMEd().format(currentTodo.date),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
@@ -292,6 +305,12 @@ class _DetailsPageState extends State<DetailsPage> {
                                                       _newDescription.text));
                                         }
 
+                                        // Update the completedDate if the status is 'Completed'
+                                        DateTime? completedDate;
+                                        if (selectedStatus == 'Completed') {
+                                          completedDate = DateTime.now();
+                                        }
+
                                         context.read<CrudBloc>().add(
                                               UpdateTodo(
                                                 todo: Todo(
@@ -306,6 +325,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                                   pin: int.parse(_newPin.text),
                                                   date: DateFormat.yMMMEd()
                                                       .parse(_newDate.text),
+                                                  completedDate: completedDate,
                                                 ),
                                               ),
                                             );

@@ -6,7 +6,6 @@ import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
-import 'package:task/task/widgets/filter.dart';
 
 class TaskPage extends StatefulWidget {
   final User? user;
@@ -33,15 +32,6 @@ class _TaskPageState extends State<TaskPage> {
           'Delivery',
           style: TextStyle(color: Colors.white),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.filter_list, color: Colors.white),
-            onPressed: () {
-              print('Filtering tasks...');
-              showFilterPopup(context);
-            },
-          ),
-        ],
         iconTheme: IconThemeData(color: Colors.white),
       ),
       drawer: Drawer(
@@ -155,6 +145,28 @@ class _TaskPageState extends State<TaskPage> {
                                 .add(FetchTasksByStatus(status: 'Paused'));
                           },
                           child: const Text('Paused Tasks'),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Show the filter options popup and get the selected date
+                            DateTime? selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2022),
+                              lastDate: DateTime(2030),
+                            );
+
+                            if (selectedDate != null) {
+                              // Show tasks for the selected date in ascending order
+                              context.read<CrudBloc>().add(FetchTasksByDate(
+                                    selectedDate: selectedDate,
+                                  ));
+                            }
+                          },
+                          child: const Text('Filter by date'),
                         ),
                       ],
                     ),

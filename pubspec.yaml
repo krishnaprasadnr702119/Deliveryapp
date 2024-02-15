@@ -53,6 +53,7 @@ dependencies:
   google_maps_flutter_web: ^0.5.4+3
   geolocator: ^10.1.1
   sqflite_common_ffi: ^2.3.2+1
+  firebase_messaging: ^14.7.15
   
 
 dev_dependencies:

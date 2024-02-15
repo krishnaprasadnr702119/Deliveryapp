@@ -15,6 +15,7 @@ class TodoFields {
     status,
     pin,
     date,
+    completedDate,
   ];
 
   static const String id = '_id';
@@ -26,6 +27,7 @@ class TodoFields {
   static const String status = 'status';
   static const String pin = 'pin';
   static const String date = 'date';
+  static const String completedDate = 'completedDate';
 }
 
 class Todo {
@@ -38,6 +40,7 @@ class Todo {
   final String status;
   final int pin;
   final DateTime date;
+  final DateTime? completedDate;
 
   Todo({
     this.id,
@@ -49,6 +52,7 @@ class Todo {
     required this.status,
     required this.pin,
     required this.date,
+    this.completedDate,
   });
 
   Todo copyWith({
@@ -61,6 +65,7 @@ class Todo {
     String? status,
     int? pin,
     DateTime? date,
+    DateTime? completedDate,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -72,6 +77,7 @@ class Todo {
       status: status ?? this.status,
       pin: pin ?? this.pin,
       date: date ?? this.date,
+      completedDate: completedDate ?? this.completedDate,
     );
   }
 
@@ -93,12 +99,12 @@ class Todo {
       status: map[TodoFields.status] as String,
       pin: map[TodoFields.pin] != null ? (map[TodoFields.pin] as int) : 0,
       date: _parseDate(map[TodoFields.date]),
+      completedDate: _parseDate(map[TodoFields.completedDate]),
     );
   }
 
   /// Serialize to JSON
   Map<String, dynamic> toJson() => {
-        TodoFields.id: id,
         TodoFields.title: title,
         TodoFields.isImportant: isImportant ? 1 : 0,
         TodoFields.number: number,
@@ -107,6 +113,9 @@ class Todo {
         TodoFields.status: status,
         TodoFields.pin: pin,
         TodoFields.date: DateFormat('MM/dd/yy').format(date),
+        TodoFields.completedDate: completedDate != null
+            ? DateFormat('MM/dd/yy').format(completedDate!)
+            : null,
       };
 
   /// Helper method to parse date with custom format and error handling

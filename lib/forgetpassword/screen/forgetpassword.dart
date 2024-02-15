@@ -125,6 +125,7 @@ class ForgetPasswordForm extends StatelessWidget {
                               confirmPassword.isNotEmpty) {
                             if (password == confirmPassword) {
                               User forgetUser = User(
+                                id: User.generateUserId(),
                                 username: username,
                                 email: email,
                                 password: password,

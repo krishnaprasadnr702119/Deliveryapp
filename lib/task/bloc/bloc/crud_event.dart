@@ -32,13 +32,12 @@ class AddTodo extends CrudEvent {
 
 class UpdateTodo extends CrudEvent {
   final Todo todo;
+  final DateTime? completedDate;
 
-  const UpdateTodo({
-    required this.todo,
-  });
+  const UpdateTodo({required this.todo, this.completedDate});
 
   @override
-  List<Object?> get props => [todo];
+  List<Object?> get props => [todo, completedDate];
 
   get status => null;
 
@@ -93,4 +92,13 @@ class FetchTasksByStatus extends CrudEvent {
 
   @override
   List<Object?> get props => [status];
+}
+
+class FetchTasksByDate extends CrudEvent {
+  final DateTime selectedDate;
+
+  const FetchTasksByDate({required this.selectedDate});
+
+  @override
+  List<Object> get props => [selectedDate];
 }
