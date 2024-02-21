@@ -13,31 +13,43 @@ class AddTodo extends CrudEvent {
   final String status;
   final int pin;
   final DateTime date;
+  final String userId;
 
-  const AddTodo({
-    required this.title,
-    required this.isImportant,
-    required this.number,
-    required this.description,
-    required this.createdTime,
-    required this.status,
-    required this.pin,
-    required this.date,
-  });
+  const AddTodo(
+      {required this.title,
+      required this.isImportant,
+      required this.number,
+      required this.description,
+      required this.createdTime,
+      required this.status,
+      required this.pin,
+      required this.date,
+      required this.userId});
 
   @override
-  List<Object?> get props =>
-      [title, isImportant, number, description, createdTime, status, pin, date];
+  List<Object?> get props => [
+        title,
+        isImportant,
+        number,
+        description,
+        createdTime,
+        status,
+        pin,
+        date,
+        userId
+      ];
 }
 
 class UpdateTodo extends CrudEvent {
   final Todo todo;
   final DateTime? completedDate;
+  final String? userId;
 
-  const UpdateTodo({required this.todo, this.completedDate});
+  const UpdateTodo(
+      {required this.todo, this.completedDate, required this.userId});
 
   @override
-  List<Object?> get props => [todo, completedDate];
+  List<Object?> get props => [todo, completedDate, userId];
 
   get status => null;
 
@@ -61,44 +73,51 @@ class OpenGoogleMapsEvent extends CrudEvent {
 }
 
 class FetchTodos extends CrudEvent {
-  const FetchTodos();
+  final String userId;
+  const FetchTodos({required this.userId});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userId];
 }
 
 class FetchSpecificTodo extends CrudEvent {
   final int id;
+  final String userId;
 
-  const FetchSpecificTodo({required this.id});
+  const FetchSpecificTodo({required this.id, required this.userId});
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, userId];
 }
 
 class DeleteTodo extends CrudEvent {
   final int id;
+  final String userId;
 
-  const DeleteTodo({required this.id});
+  const DeleteTodo({required this.id, required this.userId});
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, userId];
 }
 
 class FetchTasksByStatus extends CrudEvent {
   final String status;
-
-  const FetchTasksByStatus({required this.status});
+  final String userId;
+  const FetchTasksByStatus({
+    required this.status,
+    required this.userId,
+  });
 
   @override
-  List<Object?> get props => [status];
+  List<Object?> get props => [status, userId];
 }
 
 class FetchTasksByDate extends CrudEvent {
   final DateTime selectedDate;
+  final String userId;
 
-  const FetchTasksByDate({required this.selectedDate});
+  FetchTasksByDate({required this.selectedDate, required this.userId});
 
   @override
-  List<Object> get props => [selectedDate];
+  List<Object> get props => [selectedDate, userId];
 }

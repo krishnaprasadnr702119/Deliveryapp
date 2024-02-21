@@ -1,13 +1,13 @@
 import 'package:uuid/uuid.dart';
 
 class User {
-  final String id; // Change id type to String
+  final String id;
   final String username;
   final String email;
   final String password;
 
   User({
-    required this.id, // Update id type to String
+    required this.id,
     required this.username,
     required this.email,
     required this.password,
@@ -51,5 +51,19 @@ class User {
   // Static method to generate a unique user ID using the uuid package
   static String generateUserId() {
     return Uuid().v4();
+  }
+
+  // Factory method to create a new User instance with a generated ID
+  factory User.generateUser({
+    required String username,
+    required String email,
+    required String password,
+  }) {
+    return User(
+      id: generateUserId(),
+      username: username,
+      email: email,
+      password: password,
+    );
   }
 }

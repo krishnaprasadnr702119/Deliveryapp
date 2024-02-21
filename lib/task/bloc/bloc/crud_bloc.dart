@@ -21,6 +21,7 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
           status: 'Pending',
           pin: event.pin,
           date: event.date,
+          userId: event.userId,
         ),
       );
     });
@@ -30,12 +31,13 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
         todo: event.todo.copyWith(
           status: event.status,
           completedDate: event.completedDate,
+          userId: event.userId,
         ),
       );
     });
 
     on<FetchTodos>((event, emit) async {
-      todos = await AppDatabase().readAllTodos();
+      todos = await AppDatabase().readAllTodos(userId: event.userId);
       emit(DisplayTodos(todo: todos));
     });
 
@@ -46,11 +48,12 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
 
     on<DeleteTodo>((event, emit) async {
       await AppDatabase().delete(id: event.id);
-      add(const FetchTodos());
+      add(FetchTodos(userId: event.userId));
     });
 
     on<FetchTasksByStatus>((event, emit) async {
-      List<Todo> tasks = await AppDatabase().readTodosByStatus(event.status);
+      List<Todo> tasks = await AppDatabase()
+          .readTodosByStatus(event.status, userId: event.userId);
       emit(DisplayTodos(todo: tasks));
     });
 
@@ -58,8 +61,8 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
       await openGoogleMaps(event.location);
     });
     on<FetchTasksByDate>((event, emit) async {
-      List<Todo> tasks =
-          await AppDatabase().readTodosByDate(event.selectedDate);
+      List<Todo> tasks = await AppDatabase()
+          .readTodosByDate(event.selectedDate, userId: event.userId);
       emit(DisplayTodos(todo: tasks));
     });
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/task.dart';
 import 'package:task/task/widgets/dropdown_util.dart';
@@ -10,7 +11,8 @@ import '../models/todo.dart';
 import '../widgets/custom_text.dart';
 
 class DetailsPage extends StatefulWidget {
-  const DetailsPage({Key? key}) : super(key: key);
+  final User? user;
+  const DetailsPage({Key? key, this.user}) : super(key: key);
 
   @override
   State<DetailsPage> createState() => _DetailsPageState();
@@ -40,7 +42,9 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            context.read<CrudBloc>().add(const FetchTodos());
+            context
+                .read<CrudBloc>()
+                .add(FetchTodos(userId: widget.user?.id ?? ''));
             Navigator.pop(context);
           },
         ),
@@ -327,6 +331,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                                       .parse(_newDate.text),
                                                   completedDate: completedDate,
                                                 ),
+                                                userId: widget.user?.id ?? '',
                                               ),
                                             );
                                         ScaffoldMessenger.of(context)
@@ -338,9 +343,8 @@ class _DetailsPageState extends State<DetailsPage> {
 
                                         Navigator.popUntil(
                                             context, (route) => route.isFirst);
-                                        context
-                                            .read<CrudBloc>()
-                                            .add(const FetchTodos());
+                                        context.read<CrudBloc>().add(FetchTodos(
+                                            userId: widget.user?.id ?? ''));
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

@@ -1,9 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:task/data/database_helper.dart';
-import 'package:task/models/user.dart';
-
-import '../models/login_helper.dart';
+import 'package:task/src/models/user.dart';
+import 'package:task/src/models/login_helper.dart';
 
 part 'login_event.dart';
 part 'login_state.dart';

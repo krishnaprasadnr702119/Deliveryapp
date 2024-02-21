@@ -4,7 +4,7 @@ import 'package:task/task/bloc/bloc/crud_bloc.dart';
 
 class Filter {
   static Future<void> showFilterOptionsPopup(
-      BuildContext context, DateTime selectedDate) async {
+      BuildContext context, DateTime selectedDate, String userId) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -17,7 +17,8 @@ class Filter {
                 onPressed: () {
                   Navigator.pop(context);
                   // Handle filtering by created date
-                  context.read<CrudBloc>().add(const FetchTasksByStatus(
+                  context.read<CrudBloc>().add(FetchTasksByStatus(
+                        userId: userId,
                         status: 'Filter by created date',
                       ));
                 },
@@ -28,7 +29,8 @@ class Filter {
                 onPressed: () {
                   Navigator.pop(context);
                   // Handle filtering by complete date
-                  context.read<CrudBloc>().add(const FetchTasksByStatus(
+                  context.read<CrudBloc>().add(FetchTasksByStatus(
+                        userId: userId,
                         status: 'Filter by complete date',
                       ));
                 },
@@ -40,6 +42,7 @@ class Filter {
                   Navigator.pop(context);
                   // Fetch tasks for the selected date in ascending order
                   context.read<CrudBloc>().add(FetchTasksByDate(
+                        userId: userId,
                         selectedDate: selectedDate,
                       ));
                 },

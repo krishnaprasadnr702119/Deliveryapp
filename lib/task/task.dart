@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task/login/screen/login.dart';
-import 'package:task/models/user.dart';
+import 'package:task/src/screen/login.dart';
+import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
@@ -20,7 +20,7 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    context.read<CrudBloc>().add(const FetchTodos());
+    context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
   }
 
   @override
@@ -74,7 +74,7 @@ class _TaskPageState extends State<TaskPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (c) => const AddTodoPage()),
+            MaterialPageRoute(builder: (c) => AddTodoPage(user: widget.user)),
           );
         },
       ),
@@ -98,7 +98,10 @@ class _TaskPageState extends State<TaskPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            context.read<CrudBloc>().add(const FetchTodos());
+                            // Fetch all tasks for the current user
+                            context
+                                .read<CrudBloc>()
+                                .add(FetchTodos(userId: widget.user?.id ?? ''));
                           },
                           child: const Text('All Tasks'),
                         ),
@@ -107,9 +110,10 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<CrudBloc>()
-                                .add(FetchTasksByStatus(status: 'Completed'));
+                            // Fetch completed tasks for the current user
+                            context.read<CrudBloc>().add(FetchTasksByStatus(
+                                status: 'Completed',
+                                userId: widget.user?.id ?? ''));
                           },
                           child: const Text('Completed Tasks'),
                         ),
@@ -118,9 +122,10 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<CrudBloc>()
-                                .add(FetchTasksByStatus(status: 'Pending'));
+                            // Fetch pending tasks for the current user
+                            context.read<CrudBloc>().add(FetchTasksByStatus(
+                                status: 'Pending',
+                                userId: widget.user?.id ?? ''));
                           },
                           child: const Text('Pending Tasks'),
                         ),
@@ -129,9 +134,10 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<CrudBloc>()
-                                .add(FetchTasksByStatus(status: 'Started'));
+                            // Fetch tasks started by the current user
+                            context.read<CrudBloc>().add(FetchTasksByStatus(
+                                status: 'Started',
+                                userId: widget.user?.id ?? ''));
                           },
                           child: const Text('Started Tasks'),
                         ),
@@ -140,9 +146,10 @@ class _TaskPageState extends State<TaskPage> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<CrudBloc>()
-                                .add(FetchTasksByStatus(status: 'Paused'));
+                            // Fetch paused tasks for the current user
+                            context.read<CrudBloc>().add(FetchTasksByStatus(
+                                status: 'Paused',
+                                userId: widget.user?.id ?? ''));
                           },
                           child: const Text('Paused Tasks'),
                         ),
@@ -162,8 +169,8 @@ class _TaskPageState extends State<TaskPage> {
                             if (selectedDate != null) {
                               // Show tasks for the selected date in ascending order
                               context.read<CrudBloc>().add(FetchTasksByDate(
-                                    selectedDate: selectedDate,
-                                  ));
+                                  selectedDate: selectedDate,
+                                  userId: widget.user?.id ?? ''));
                             }
                           },
                           child: const Text('Filter by date'),
@@ -191,9 +198,9 @@ class _TaskPageState extends State<TaskPage> {
 
                           return GestureDetector(
                             onTap: () {
-                              context
-                                  .read<CrudBloc>()
-                                  .add(FetchSpecificTodo(id: currentTodo.id!));
+                              context.read<CrudBloc>().add(FetchSpecificTodo(
+                                  id: currentTodo.id!,
+                                  userId: widget.user?.id ?? ''));
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -230,7 +237,9 @@ class _TaskPageState extends State<TaskPage> {
                                             onPressed: () {
                                               context.read<CrudBloc>().add(
                                                   DeleteTodo(
-                                                      id: currentTodo.id!));
+                                                      id: currentTodo.id!,
+                                                      userId: widget.user?.id ??
+                                                          ''));
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(

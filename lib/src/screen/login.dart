@@ -1,10 +1,14 @@
+// login.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task/forgetpassword/screen/forgetpassword.dart';
-import 'package:task/login/models/login_helper.dart';
-import 'package:task/login/bloc/login_bloc.dart';
-import 'package:task/models/user.dart';
-import 'package:task/signup/screen/registration.dart';
+import 'package:task/src/screen/forgetpassword.dart';
+import 'package:task/src/login/bloc/login_bloc.dart';
+import 'package:task/src/models/login_helper.dart';
+import 'package:task/src/models/user.dart';
+import 'package:task/src/screen/registration.dart';
+import 'package:task/src/utils/message.dart';
+import 'package:task/src/widgets/login_fields.dart';
 import 'package:task/task/task.dart';
 
 class LoginPage extends StatelessWidget {
@@ -42,7 +46,8 @@ class LoginPage extends StatelessWidget {
                 } else if (state is LoginFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Login  failed: ${state.error}'),
+                      content: Text(
+                          '${RegistrationValidator.LoginFailed} ${state.error}'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -54,33 +59,10 @@ class LoginPage extends StatelessWidget {
                   children: [
                     Image.asset('assets/logo.png', height: 400, width: 260),
                     SizedBox(height: 16),
-                    TextField(
-                      controller: _usernameController,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
+                    LoginFields(
+                      usernameController: _usernameController,
+                      passwordController: _passwordController,
                     ),
-                    SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 16),
                     Container(
                       width: double.infinity,
                       height: 56,
@@ -91,12 +73,14 @@ class LoginPage extends StatelessWidget {
 
                           if (username.isNotEmpty && password.isNotEmpty) {
                             UserCredentials credentials = UserCredentials(
-                                username: username, password: password);
+                              username: username,
+                              password: password,
+                            );
                             loginBloc.add(LoginSubmitted(credentials));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Please fill in all fields.'),
+                                content: Text(RegistrationValidator.fill),
                               ),
                             );
                           }
@@ -106,7 +90,7 @@ class LoginPage extends StatelessWidget {
                               MaterialStateProperty.all(Colors.blue),
                         ),
                         child: Text(
-                          'Login',
+                          RegistrationValidator.Login,
                           style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
                       ),
@@ -124,7 +108,7 @@ class LoginPage extends StatelessWidget {
                             );
                           },
                           child: Text(
-                            'Forget Password',
+                            RegistrationValidator.Forget,
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -137,7 +121,7 @@ class LoginPage extends StatelessWidget {
                             );
                           },
                           child: Text(
-                            'Create an account',
+                            RegistrationValidator.account,
                             style: TextStyle(color: Colors.white),
                           ),
                         )

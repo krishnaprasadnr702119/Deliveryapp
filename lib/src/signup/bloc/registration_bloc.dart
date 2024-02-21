@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:task/data/database_helper.dart';
-import 'package:task/models/user.dart';
+import 'package:task/src/models/user.dart';
 
 part 'registration_event.dart';
 part 'registration_state.dart';

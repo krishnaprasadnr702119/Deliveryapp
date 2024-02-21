@@ -2,12 +2,16 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/widgets/custom_text.dart';
 
 class AddTodoPage extends StatefulWidget {
-  const AddTodoPage({Key? key}) : super(key: key);
+  final User? user;
+
+  const AddTodoPage({Key? key, this.user}) : super(key: key);
 
   @override
   State<AddTodoPage> createState() => _AddTodoPageState();
@@ -18,6 +22,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   final TextEditingController _description = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String selectedStatus = 'Pending';
 
   @override
@@ -72,13 +77,16 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 const SizedBox(height: 16),
                 CustomText(text: 'location'.toUpperCase()),
                 TextFormField(
-                  controller: _description,
+                  controller: _locationController,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  onTap: () {
+                    _navigateToMapScreen();
+                  },
                 ),
                 const SizedBox(height: 16),
                 CustomText(text: 'Pin'.toUpperCase()),
@@ -124,7 +132,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_title.text.isNotEmpty &&
-                              _description.text.isNotEmpty &&
+                              _locationController.text.isNotEmpty &&
                               _pinController.text.isNotEmpty &&
                               _dateController.text.isNotEmpty) {
                             try {
@@ -143,23 +151,22 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                         title: _title.text,
                                         isImportant: false,
                                         number: 0,
-                                        description: _description.text,
+                                        description: _locationController.text,
                                         createdTime: DateTime.now(),
                                         status: selectedStatus,
                                         pin: pin,
                                         date: parsedDate,
+                                        userId: widget.user!.id,
                                       ),
                                     );
-
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       duration: Duration(seconds: 1),
                                       content: Text("Task successfully"),
                                       backgroundColor: Colors.green),
                                 );
-                                context
-                                    .read<CrudBloc>()
-                                    .add(const FetchTodos());
+                                context.read<CrudBloc>().add(
+                                    FetchTodos(userId: widget.user?.id ?? ''));
                                 Navigator.pop(context);
                               } else {
                                 print("Invalid date: $parsedDate");
@@ -200,6 +207,76 @@ class _AddTodoPageState extends State<AddTodoPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToMapScreen() async {
+    final LatLng? selectedLocation = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapScreen(),
+      ),
+    );
+
+    if (selectedLocation != null) {
+      _locationController.text =
+          "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
+    }
+  }
+}
+
+// ...
+
+class MapScreen extends StatefulWidget {
+  @override
+  _MapScreenState createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  late GoogleMapController mapController;
+  LatLng? selectedLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    // Provide an initial camera position
+    CameraPosition initialCameraPosition = CameraPosition(
+      target: LatLng(8.5705, 76.8728), // Trivandrum Kazhakootam coordinates
+      zoom: 13.0,
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Select Location'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () {
+              Navigator.pop(context, selectedLocation);
+            },
+          ),
+        ],
+      ),
+      body: GoogleMap(
+        onMapCreated: (controller) {
+          mapController = controller;
+        },
+        initialCameraPosition: initialCameraPosition,
+        onTap: (LatLng location) {
+          setState(() {
+            selectedLocation = location;
+          });
+        },
+        markers: Set<Marker>.of(
+          selectedLocation != null
+              ? [
+                  Marker(
+                    markerId: MarkerId('selectedLocation'),
+                    position: selectedLocation!,
+                  ),
+                ]
+              : [],
         ),
       ),
     );

@@ -16,6 +16,7 @@ class TodoFields {
     pin,
     date,
     completedDate,
+    userId,
   ];
 
   static const String id = '_id';
@@ -28,6 +29,7 @@ class TodoFields {
   static const String pin = 'pin';
   static const String date = 'date';
   static const String completedDate = 'completedDate';
+  static const String userId = "userId";
 }
 
 class Todo {
@@ -41,6 +43,7 @@ class Todo {
   final int pin;
   final DateTime date;
   final DateTime? completedDate;
+  final String? userId;
 
   Todo({
     this.id,
@@ -53,6 +56,7 @@ class Todo {
     required this.pin,
     required this.date,
     this.completedDate,
+    this.userId,
   });
 
   Todo copyWith({
@@ -66,6 +70,7 @@ class Todo {
     int? pin,
     DateTime? date,
     DateTime? completedDate,
+    String? userId,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -78,6 +83,7 @@ class Todo {
       pin: pin ?? this.pin,
       date: date ?? this.date,
       completedDate: completedDate ?? this.completedDate,
+      userId: userId ?? this.userId,
     );
   }
 
@@ -100,6 +106,7 @@ class Todo {
       pin: map[TodoFields.pin] != null ? (map[TodoFields.pin] as int) : 0,
       date: _parseDate(map[TodoFields.date]),
       completedDate: _parseDate(map[TodoFields.completedDate]),
+      userId: map[TodoFields.userId] as String,
     );
   }
 
@@ -116,6 +123,7 @@ class Todo {
         TodoFields.completedDate: completedDate != null
             ? DateFormat('MM/dd/yy').format(completedDate!)
             : null,
+        TodoFields.userId: userId,
       };
 
   /// Helper method to parse date with custom format and error handling
