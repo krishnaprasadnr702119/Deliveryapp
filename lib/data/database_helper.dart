@@ -1,14 +1,11 @@
 import 'dart:convert';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:password_hash_plus/password_hash_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
-import 'package:task/task/models/userloction.dart';
 
 class AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();
@@ -17,8 +14,8 @@ class AppDatabase {
   Database? _database;
   Future<void> initDatabase() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'task.db');
-    _database = await openDatabase(path, version: 3, onCreate: _createDb);
+    final path = join(databasesPath, 'taskup.db');
+    _database = await openDatabase(path, version: 2, onCreate: _createDb);
     print("Database initialized.");
   }
 
@@ -136,6 +133,7 @@ class AppDatabase {
     final id = await db!.insert(todoTable, {
       ...todo.toJson(),
       TodoFields.userId: todo.userId,
+      'time': todo.createdTime.toIso8601String(),
     });
     return todo.copyWith(id: id, status: todo.status);
   }
@@ -159,15 +157,17 @@ class AppDatabase {
 
   Future<List<Todo>> readAllTodos({required String userId}) async {
     final db = await _database;
-    final where = 'userId = ?'; // Use a parameterized query
+    final where = 'userId = ?';
     const orderBy = '${TodoFields.time} ASC';
     final result = await db!
         .query(todoTable, orderBy: orderBy, where: where, whereArgs: [userId]);
+    print(result);
     return result.map((json) => Todo.fromMap(json)).toList();
   }
 
   Future<int> update({required Todo todo}) async {
     final db = await _database;
+    print(todo);
     return db!.update(
       todoTable,
       {
@@ -214,11 +214,43 @@ class AppDatabase {
 
   Future<List<Todo>> readTodosByDate(DateTime selectedDate,
       {required String userId}) async {
+    final DateTime startDate =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final DateTime endDate = startDate.add(Duration(days: 1));
+
     final List<Map<String, Object?>>? maps = await _database?.query(
       todoTable,
-      where: '${TodoFields.date} = ? AND ${TodoFields.userId} = ?',
-      whereArgs: [selectedDate.toIso8601String(), userId],
+      where:
+          '${TodoFields.time} >= ? AND ${TodoFields.time} < ? AND ${TodoFields.userId} = ?',
+      whereArgs: [
+        startDate.toIso8601String(),
+        endDate.toIso8601String(),
+        userId
+      ],
       orderBy: '${TodoFields.time} ASC',
+    );
+
+    return List.generate(maps!.length, (i) {
+      return Todo.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<Todo>> readTodosByCompletedDate(DateTime selectedDate,
+      {required String userId}) async {
+    final DateTime startDate =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final DateTime endDate = startDate.add(Duration(days: 1));
+
+    final List<Map<String, Object?>>? maps = await _database?.query(
+      todoTable,
+      where:
+          '${TodoFields.completedDate} >= ? AND ${TodoFields.completedDate} < ? AND ${TodoFields.userId} = ?',
+      whereArgs: [
+        startDate.toIso8601String(),
+        endDate.toIso8601String(),
+        userId
+      ],
+      orderBy: '${TodoFields.completedDate} ASC, ${TodoFields.time} ASC',
     );
 
     return List.generate(maps!.length, (i) {

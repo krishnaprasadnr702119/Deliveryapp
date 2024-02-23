@@ -42,9 +42,6 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            context
-                .read<CrudBloc>()
-                .add(FetchTodos(userId: widget.user?.id ?? ''));
             Navigator.pop(context);
           },
         ),
@@ -280,8 +277,14 @@ class _DetailsPageState extends State<DetailsPage> {
                                             selectedStatus = newValue!;
                                           });
                                         },
-                                        items: getDropdownItems(
-                                            currentTodo.status),
+                                        items: statusOptions
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                       ),
                                     ],
                                   ),
@@ -309,7 +312,6 @@ class _DetailsPageState extends State<DetailsPage> {
                                                       _newDescription.text));
                                         }
 
-                                        // Update the completedDate if the status is 'Completed'
                                         DateTime? completedDate;
                                         if (selectedStatus == 'Completed') {
                                           completedDate = DateTime.now();
@@ -317,29 +319,34 @@ class _DetailsPageState extends State<DetailsPage> {
 
                                         context.read<CrudBloc>().add(
                                               UpdateTodo(
-                                                todo: Todo(
-                                                  id: currentTodo.id,
-                                                  createdTime: DateTime.now(),
-                                                  description:
-                                                      _newDescription.text,
-                                                  isImportant: toggleSwitch,
-                                                  number: currentTodo.number,
-                                                  title: _newTitle.text,
-                                                  status: selectedStatus,
-                                                  pin: int.parse(_newPin.text),
-                                                  date: DateFormat.yMMMEd()
-                                                      .parse(_newDate.text),
-                                                  completedDate: completedDate,
-                                                ),
-                                                userId: widget.user?.id ?? '',
-                                              ),
+                                                  todo: Todo(
+                                                    id: currentTodo.id,
+                                                    createdTime:
+                                                        currentTodo.createdTime,
+                                                    description:
+                                                        _newDescription.text,
+                                                    isImportant: toggleSwitch,
+                                                    number: currentTodo.number,
+                                                    title: _newTitle.text,
+                                                    status: selectedStatus,
+                                                    pin:
+                                                        int.parse(_newPin.text),
+                                                    date: DateFormat.yMMMEd()
+                                                        .parse(_newDate.text),
+                                                    completedDate:
+                                                        completedDate,
+                                                  ),
+                                                  userId:
+                                                      widget.user?.id ?? ''),
                                             );
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                          backgroundColor: Colors.green,
-                                          duration: Duration(seconds: 1),
-                                          content: Text('Task updated'),
-                                        ));
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            backgroundColor: Colors.green,
+                                            duration: Duration(seconds: 1),
+                                            content: Text('Task updated'),
+                                          ),
+                                        );
 
                                         Navigator.popUntil(
                                             context, (route) => route.isFirst);
@@ -352,7 +359,6 @@ class _DetailsPageState extends State<DetailsPage> {
                                                   const TaskPage()),
                                         );
                                       } else {
-                                        // Display an error message because the entered PIN is incorrect
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(

@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task/data/database_helper.dart';
@@ -8,7 +7,6 @@ import 'package:task/src/screen/login.dart';
 import 'package:task/src/screen/splashscreen.dart';
 import 'package:task/src/signup/bloc/registration_bloc.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

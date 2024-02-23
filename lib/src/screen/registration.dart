@@ -28,8 +28,6 @@ class RegistrationForm extends StatelessWidget {
       backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/background.jpg'),

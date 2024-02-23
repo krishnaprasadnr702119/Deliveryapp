@@ -43,7 +43,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.red,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
@@ -226,8 +226,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
     }
   }
 }
-
-// ...
 
 class MapScreen extends StatefulWidget {
   @override

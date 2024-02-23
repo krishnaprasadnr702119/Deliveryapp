@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task/data/database_helper.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
+import 'package:task/task/widgets/statuscolor.dart';
 
 class TaskPage extends StatefulWidget {
   final User? user;
@@ -16,11 +19,39 @@ class TaskPage extends StatefulWidget {
   _TaskPageState createState() => _TaskPageState();
 }
 
-class _TaskPageState extends State<TaskPage> {
+class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
+  String? selectedFilter;
+
   @override
   void initState() {
     super.initState();
-    context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
+    WidgetsBinding.instance?.addObserver(this);
+    _checkUserIdInSharedPreferences();
+    AppDatabase().initDatabase();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // App resumed, check if user ID exists in shared preferences
+      _checkUserIdInSharedPreferences();
+    }
+  }
+
+  Future<void> _checkUserIdInSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+
+    if (userId != null) {
+      // User ID exists in shared preferences, fetch and display tasks
+      context.read<CrudBloc>().add(FetchTodos(userId: userId));
+    }
   }
 
   @override
@@ -28,11 +59,48 @@ class _TaskPageState extends State<TaskPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
+        title: const Text(
           'Delivery',
           style: TextStyle(color: Colors.white),
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              _applyFilter(value);
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem<String>(
+                  value: 'Completed',
+                  child: Text('Completed Tasks'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Pending',
+                  child: Text('Pending Tasks'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Started',
+                  child: Text('Started Tasks'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'Created',
+                  child: Text('Filter by Created Date'),
+                  onTap: () async {
+                    await _selectDate(context, filter: 'Created');
+                  },
+                ),
+                PopupMenuItem<String>(
+                  value: 'Completed',
+                  child: Text('Filter by Completed Date'),
+                  onTap: () async {
+                    await _selectDate(context, filter: 'Completed');
+                  },
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -93,87 +161,14 @@ class _TaskPageState extends State<TaskPage> {
               child: Column(
                 children: [
                   SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // Fetch all tasks for the current user
-                            context
-                                .read<CrudBloc>()
-                                .add(FetchTodos(userId: widget.user?.id ?? ''));
+                            _applyFilter(null);
                           },
                           child: const Text('All Tasks'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Fetch completed tasks for the current user
-                            context.read<CrudBloc>().add(FetchTasksByStatus(
-                                status: 'Completed',
-                                userId: widget.user?.id ?? ''));
-                          },
-                          child: const Text('Completed Tasks'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Fetch pending tasks for the current user
-                            context.read<CrudBloc>().add(FetchTasksByStatus(
-                                status: 'Pending',
-                                userId: widget.user?.id ?? ''));
-                          },
-                          child: const Text('Pending Tasks'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Fetch tasks started by the current user
-                            context.read<CrudBloc>().add(FetchTasksByStatus(
-                                status: 'Started',
-                                userId: widget.user?.id ?? ''));
-                          },
-                          child: const Text('Started Tasks'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Fetch paused tasks for the current user
-                            context.read<CrudBloc>().add(FetchTasksByStatus(
-                                status: 'Paused',
-                                userId: widget.user?.id ?? ''));
-                          },
-                          child: const Text('Paused Tasks'),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            // Show the filter options popup and get the selected date
-                            DateTime? selectedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2022),
-                              lastDate: DateTime(2030),
-                            );
-
-                            if (selectedDate != null) {
-                              // Show tasks for the selected date in ascending order
-                              context.read<CrudBloc>().add(FetchTasksByDate(
-                                  selectedDate: selectedDate,
-                                  userId: widget.user?.id ?? ''));
-                            }
-                          },
-                          child: const Text('Filter by date'),
                         ),
                       ],
                     ),
@@ -184,17 +179,6 @@ class _TaskPageState extends State<TaskPage> {
                         itemCount: state.todo.length,
                         itemBuilder: (context, i) {
                           Todo currentTodo = state.todo[i];
-                          Color statusColor = Colors.white;
-
-                          if (currentTodo.status == 'Completed') {
-                            statusColor = Colors.green;
-                          } else if (currentTodo.status == 'Started') {
-                            statusColor = Colors.yellow;
-                          } else if (currentTodo.status == 'Paused') {
-                            statusColor = Colors.orange;
-                          } else if (currentTodo.status == 'Pending') {
-                            statusColor = Colors.blue;
-                          }
 
                           return GestureDetector(
                             onTap: () {
@@ -204,7 +188,8 @@ class _TaskPageState extends State<TaskPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: ((context) => DetailsPage()),
+                                  builder: ((context) =>
+                                      DetailsPage(user: widget.user)),
                                 ),
                               );
                             },
@@ -213,53 +198,35 @@ class _TaskPageState extends State<TaskPage> {
                               margin: const EdgeInsets.only(bottom: 14),
                               child: Card(
                                 elevation: 10,
-                                color: statusColor,
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        currentTodo.title.toUpperCase(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        'Status: ${currentTodo.status}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              context.read<CrudBloc>().add(
-                                                  DeleteTodo(
-                                                      id: currentTodo.id!,
-                                                      userId: widget.user?.id ??
-                                                          ''));
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                    duration: Duration(
-                                                        milliseconds: 500),
-                                                    content:
-                                                        Text("Deleted Task"),
-                                                    backgroundColor:
-                                                        Colors.green),
-                                              );
-                                            },
-                                            icon: const Icon(
-                                              Icons.delete,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                color: StatusColor.getColor(currentTodo.status),
+                                child: ListTile(
+                                  title: Text(
+                                    currentTodo.title.toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
+                                  ),
+                                  subtitle: Text(
+                                    'Status: ${currentTodo.status}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          _deleteTask(currentTodo.id!);
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -274,6 +241,57 @@ class _TaskPageState extends State<TaskPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context,
+      {required String filter}) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      _applyFilter(filter, selectedDate: pickedDate);
+    }
+  }
+
+  void _applyFilter(String? filter, {DateTime? selectedDate}) {
+    setState(() {
+      selectedFilter = filter;
+    });
+
+    if (filter == null) {
+      context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
+    } else if (filter == 'Created' && selectedDate != null) {
+      context.read<CrudBloc>().add(FetchTasksByDate(
+            selectedDate: selectedDate,
+            userId: widget.user?.id ?? '',
+          ));
+    } else if (filter == 'Completed' && selectedDate != null) {
+      context.read<CrudBloc>().add(FetchTasksByCompletedDate(
+            selectedDate: selectedDate,
+            userId: widget.user?.id ?? '',
+          ));
+    } else {
+      context.read<CrudBloc>().add(FetchTasksByStatus(
+            status: filter,
+            userId: widget.user?.id ?? '',
+          ));
+    }
+  }
+
+  void _deleteTask(int Id) {
+    context
+        .read<CrudBloc>()
+        .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(milliseconds: 500),
+        content: Text("Deleted Task"),
+        backgroundColor: Colors.green,
       ),
     );
   }

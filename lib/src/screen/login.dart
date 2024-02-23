@@ -1,7 +1,6 @@
-// login.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/screen/forgetpassword.dart';
 import 'package:task/src/login/bloc/login_bloc.dart';
 import 'package:task/src/models/login_helper.dart';
@@ -19,6 +18,11 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoginBloc loginBloc = BlocProvider.of<LoginBloc>(context);
 
+    Future<void> _saveUserIdToSharedPreferences(String userId) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('userId', userId);
+    }
+
     return Scaffold(
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -32,9 +36,11 @@ class LoginPage extends StatelessWidget {
         child: Center(
           child: SingleChildScrollView(
             child: BlocListener<LoginBloc, LoginState>(
-              listener: (context, state) {
+              listener: (context, state) async {
                 if (state is LoginSuccess) {
                   User user = state.user;
+                  await _saveUserIdToSharedPreferences(user.id);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

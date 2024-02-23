@@ -47,11 +47,8 @@ class UpdateTodo extends CrudEvent {
 
   const UpdateTodo(
       {required this.todo, this.completedDate, required this.userId});
-
   @override
   List<Object?> get props => [todo, completedDate, userId];
-
-  get status => null;
 
   // Nested OpenGoogleMapsEvent
   OpenGoogleMapsEvent openGoogleMapsEvent({
@@ -119,5 +116,23 @@ class FetchTasksByDate extends CrudEvent {
   FetchTasksByDate({required this.selectedDate, required this.userId});
 
   @override
-  List<Object> get props => [selectedDate, userId];
+  List<Object?> get props => [selectedDate, userId];
+}
+
+class FetchTasksByCompletedDate extends CrudEvent {
+  final DateTime selectedDate;
+  final String userId;
+
+  FetchTasksByCompletedDate({required this.selectedDate, required this.userId});
+
+  @override
+  List<Object?> get props => [selectedDate, userId];
+}
+
+class DisplayTasksByCompletedDate extends CrudState {
+  final List<Todo> todo;
+
+  const DisplayTasksByCompletedDate({required this.todo});
+  @override
+  List<Object> get props => [todo];
 }
