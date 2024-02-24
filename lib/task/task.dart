@@ -21,11 +21,13 @@ class TaskPage extends StatefulWidget {
 
 class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   String? selectedFilter;
+  late bool isLoading;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
+    isLoading = false;
     _checkUserIdInSharedPreferences();
     AppDatabase().initDatabase();
   }
@@ -39,18 +41,28 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // App resumed, check if user ID exists in shared preferences
       _checkUserIdInSharedPreferences();
     }
   }
 
   Future<void> _checkUserIdInSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
+    setState(() {
+      isLoading = true;
+    });
 
-    if (userId != null) {
-      // User ID exists in shared preferences, fetch and display tasks
-      context.read<CrudBloc>().add(FetchTodos(userId: userId));
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+
+      if (userId != null) {
+        context.read<CrudBloc>().add(FetchTodos(userId: userId));
+      }
+    } catch (e) {
+      print('Error checking user ID: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -264,6 +276,7 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
     });
 
     if (filter == null) {
+      print("Fetching all tasks for user: ${widget.user?.id}");
       context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
     } else if (filter == 'Created' && selectedDate != null) {
       context.read<CrudBloc>().add(FetchTasksByDate(

@@ -14,7 +14,7 @@ class AppDatabase {
   Database? _database;
   Future<void> initDatabase() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'taskup.db');
+    final path = join(databasesPath, 'taskp.db');
     _database = await openDatabase(path, version: 2, onCreate: _createDb);
     print("Database initialized.");
   }
@@ -157,7 +157,7 @@ class AppDatabase {
 
   Future<List<Todo>> readAllTodos({required String userId}) async {
     final db = await _database;
-    final where = 'userId = ?';
+    const where = 'userId = ?';
     const orderBy = '${TodoFields.time} ASC';
     final result = await db!
         .query(todoTable, orderBy: orderBy, where: where, whereArgs: [userId]);
@@ -180,6 +180,7 @@ class AppDatabase {
         TodoFields.pin: todo.pin,
         TodoFields.date: todo.date.toIso8601String(),
         TodoFields.userId: todo.userId,
+        TodoFields.completedDate: todo.completedDate?.toIso8601String(),
       },
       where: '${TodoFields.id} = ?',
       whereArgs: [todo.id],

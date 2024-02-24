@@ -120,7 +120,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                         // Format the selected date in yyyy-MM-dd format
                         String formattedDate =
                             DateFormat('yyyy-MM-dd').format(selectedDate);
-                        _dateController.text = formattedDate;
+                        setState(() {
+                          _dateController.text = formattedDate;
+                        });
                       }
                     });
                   },
@@ -142,34 +144,48 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                   : 0;
 
                               // Parse and validate the date
-                              DateTime parsedDate =
-                                  DateTime.parse(_dateController.text);
+                              if (_dateController.text.isNotEmpty) {
+                                DateTime? parsedDate;
 
-                              if (parsedDate.isAfter(DateTime.now())) {
-                                context.read<CrudBloc>().add(
-                                      AddTodo(
-                                        title: _title.text,
-                                        isImportant: false,
-                                        number: 0,
-                                        description: _locationController.text,
-                                        createdTime: DateTime.now(),
-                                        status: selectedStatus,
-                                        pin: pin,
-                                        date: parsedDate,
-                                        userId: widget.user!.id,
-                                      ),
-                                    );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                try {
+                                  parsedDate =
+                                      DateTime.parse(_dateController.text);
+                                } catch (e) {
+                                  print("Error parsing date: $e");
+                                }
+
+                                if (parsedDate != null &&
+                                    parsedDate.isAfter(DateTime.now())) {
+                                  context.read<CrudBloc>().add(
+                                        AddTodo(
+                                          title: _title.text,
+                                          isImportant: false,
+                                          number: 0,
+                                          description: _locationController.text,
+                                          createdTime: DateTime.now(),
+                                          status: selectedStatus,
+                                          pin: pin,
+                                          date: parsedDate,
+                                          userId: widget.user!.id,
+                                        ),
+                                      );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
                                       duration: Duration(seconds: 1),
                                       content: Text("Task successfully"),
-                                      backgroundColor: Colors.green),
-                                );
-                                context.read<CrudBloc>().add(
-                                    FetchTodos(userId: widget.user?.id ?? ''));
-                                Navigator.pop(context);
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                  context.read<CrudBloc>().add(
+                                        FetchTodos(
+                                            userId: widget.user?.id ?? ''),
+                                      );
+                                  Navigator.pop(context);
+                                } else {
+                                  print("Invalid date: $parsedDate");
+                                }
                               } else {
-                                print("Invalid date: $parsedDate");
+                                print("Date field is empty");
                               }
                             } catch (e) {
                               print("Error parsing date: $e");
@@ -177,10 +193,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content: Text(
-                                    "All fields must be filled",
-                                  ),
-                                  backgroundColor: Colors.green),
+                                content: Text("All fields must be filled"),
+                                backgroundColor: Colors.green,
+                              ),
                             );
                           }
                         },
@@ -221,8 +236,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
     );
 
     if (selectedLocation != null) {
-      _locationController.text =
-          "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
+      setState(() {
+        _locationController.text =
+            "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
+      });
     }
   }
 }

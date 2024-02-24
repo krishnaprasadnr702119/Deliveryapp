@@ -277,14 +277,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                             selectedStatus = newValue!;
                                           });
                                         },
-                                        items: statusOptions
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
+                                        items: getDropdownItems(selectedStatus),
                                       ),
                                     ],
                                   ),
@@ -300,75 +293,77 @@ class _DetailsPageState extends State<DetailsPage> {
                                   ElevatedButton(
                                     style: Constants.customButtonStyle,
                                     onPressed: () async {
-                                      // Check if the entered PIN matches the original PIN
-                                      if (_newPin.text.isNotEmpty &&
-                                          int.parse(_newPin.text) ==
-                                              originalPin) {
-                                        // Proceed with the update logic
-                                        if (selectedStatus == 'Started') {
-                                          context.read<CrudBloc>().add(
-                                              OpenGoogleMapsEvent(
-                                                  location:
-                                                      _newDescription.text));
+                                      // Check if the status is 'Completed' before asking for PIN
+                                      if (selectedStatus == 'Completed') {
+                                        // Ask for PIN
+                                        if (_newPin.text.isEmpty) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              backgroundColor: Colors.red,
+                                              duration: Duration(seconds: 1),
+                                              content: Text(
+                                                  'Please enter PIN for completion.'),
+                                            ),
+                                          );
+                                          return; // Do not proceed without PIN
                                         }
-
-                                        DateTime? completedDate;
-                                        if (selectedStatus == 'Completed') {
-                                          completedDate = DateTime.now();
-                                        }
-
-                                        context.read<CrudBloc>().add(
-                                              UpdateTodo(
-                                                  todo: Todo(
-                                                    id: currentTodo.id,
-                                                    createdTime:
-                                                        currentTodo.createdTime,
-                                                    description:
-                                                        _newDescription.text,
-                                                    isImportant: toggleSwitch,
-                                                    number: currentTodo.number,
-                                                    title: _newTitle.text,
-                                                    status: selectedStatus,
-                                                    pin:
-                                                        int.parse(_newPin.text),
-                                                    date: DateFormat.yMMMEd()
-                                                        .parse(_newDate.text),
-                                                    completedDate:
-                                                        completedDate,
-                                                  ),
-                                                  userId:
-                                                      widget.user?.id ?? ''),
-                                            );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            backgroundColor: Colors.green,
-                                            duration: Duration(seconds: 1),
-                                            content: Text('Task updated'),
-                                          ),
-                                        );
-
-                                        Navigator.popUntil(
-                                            context, (route) => route.isFirst);
-                                        context.read<CrudBloc>().add(FetchTodos(
-                                            userId: widget.user?.id ?? ''));
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const TaskPage()),
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            backgroundColor: Colors.red,
-                                            duration: Duration(seconds: 1),
-                                            content: Text(
-                                                'Incorrect PIN. Task not updated.'),
-                                          ),
-                                        );
                                       }
+
+                                      // Proceed with the update logic
+                                      if (selectedStatus == 'Started') {
+                                        context.read<CrudBloc>().add(
+                                            OpenGoogleMapsEvent(
+                                                location:
+                                                    _newDescription.text));
+                                      }
+
+                                      DateTime? completedDate;
+                                      if (selectedStatus == 'Completed') {
+                                        completedDate = DateTime.now();
+                                      }
+
+                                      context.read<CrudBloc>().add(
+                                            UpdateTodo(
+                                              todo: Todo(
+                                                id: currentTodo.id,
+                                                createdTime:
+                                                    currentTodo.createdTime,
+                                                description:
+                                                    _newDescription.text,
+                                                isImportant: toggleSwitch,
+                                                number: currentTodo.number,
+                                                title: _newTitle.text,
+                                                status: selectedStatus,
+                                                pin: int.parse(_newPin.text),
+                                                date: DateFormat.yMMMEd()
+                                                    .parse(_newDate.text),
+                                                completedDate: completedDate,
+                                              ),
+                                              userId: widget.user?.id ?? '',
+                                            ),
+                                          );
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          backgroundColor: Colors.green,
+                                          duration: Duration(seconds: 1),
+                                          content: Text('Task updated'),
+                                        ),
+                                      );
+
+                                      Navigator.popUntil(
+                                          context, (route) => route.isFirst);
+                                      context.read<CrudBloc>().add(FetchTodos(
+                                          userId: widget.user?.id ?? ''));
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              TaskPage(user: widget.user),
+                                        ),
+                                      );
                                     },
                                     child: const Text('Update'),
                                   ),
