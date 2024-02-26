@@ -34,6 +34,8 @@ class _DetailsPageState extends State<DetailsPage> {
   File? _image;
   final picker = ImagePicker();
   late Todo currentTodo;
+  bool statusChanged = false;
+  bool isImageSelected = false;
 
   Future<void> _pickImageAndSaveToDB() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -47,7 +49,6 @@ class _DetailsPageState extends State<DetailsPage> {
         int todoId = currentTodo.id!;
         await _saveImageToDB(todoId);
 
-        // Store image path in SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('imagePath_$todoId', _image!.path);
 
@@ -59,8 +60,9 @@ class _DetailsPageState extends State<DetailsPage> {
           ),
         );
 
-        // Navigate back to the previous page
-        Navigator.pop(context);
+        setState(() {
+          isImageSelected = true;
+        });
       }
     }
   }
@@ -81,12 +83,10 @@ class _DetailsPageState extends State<DetailsPage> {
     } else {
       print("No image available");
 
-      // Retrieve image path from SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? storedImagePath = prefs.getString('imagePath_${currentTodo.id}');
 
       if (storedImagePath != null && storedImagePath.isNotEmpty) {
-        // Use the stored image path
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -112,6 +112,10 @@ class _DetailsPageState extends State<DetailsPage> {
             imagePath: imagePath,
           ));
     }
+  }
+
+  bool isPinRequired() {
+    return selectedStatus == 'Completed';
   }
 
   @override
@@ -208,6 +212,9 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                   const SizedBox(height: 10),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(280, 40),
+                    ),
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -221,236 +228,281 @@ class _DetailsPageState extends State<DetailsPage> {
 
                           return StatefulBuilder(
                             builder: ((context, setState) {
-                              return AlertDialog(
-                                title: const Text(
-                                  'Update Task',
-                                  style: TextStyle(
-                                    fontSize: 25,
-                                    letterSpacing: 2,
-                                    fontWeight: FontWeight.bold,
+                              return Center(
+                                child: AlertDialog(
+                                  title: const Text(
+                                    'Update Task',
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      letterSpacing: 2,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Order'),
-                                      ),
-                                      Flexible(
-                                        child: TextFormField(
-                                          decoration: InputDecoration(
-                                            isDense: true,
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.blue),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
-                                          ),
-                                          maxLines: 1,
-                                          controller: _newTitle,
+                                  backgroundColor: Colors.blue[200],
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Order'),
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Location'),
-                                      ),
-                                      Flexible(
-                                        child: TextFormField(
-                                          controller: _newDescription,
-                                          decoration: InputDecoration(
-                                            isDense: true,
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                        Flexible(
+                                          child: TextFormField(
+                                            decoration: InputDecoration(
+                                              isDense: true,
+                                              border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.blue),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
                                             ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.blue),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
+                                            maxLines: 1,
+                                            controller: _newTitle,
                                           ),
-                                          maxLines: 2,
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Pin'),
-                                      ),
-                                      Flexible(
-                                        child: TextFormField(
-                                          obscureText: true,
-                                          decoration: InputDecoration(
-                                            isDense: true,
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                        const SizedBox(height: 10),
+                                        const Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Location'),
+                                        ),
+                                        Flexible(
+                                          child: TextFormField(
+                                            controller: _newDescription,
+                                            decoration: InputDecoration(
+                                              isDense: true,
+                                              border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.blue),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
                                             ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.blue),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
+                                            maxLines: 2,
                                           ),
-                                          maxLines: 1,
-                                          controller: _newPin,
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Date'),
-                                      ),
-                                      Flexible(
-                                        child: TextFormField(
-                                          controller: _newDate,
-                                          decoration: InputDecoration(
-                                            isDense: true,
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.blue),
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.grey[200],
+                                        const SizedBox(height: 10),
+                                        if (isPinRequired())
+                                          const Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text('Pin'),
                                           ),
-                                          maxLines: 1,
+                                        if (isPinRequired())
+                                          Flexible(
+                                            child: TextFormField(
+                                              obscureText: true,
+                                              maxLength:
+                                                  4, // Set max length to 4 for PIN
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                isDense: true,
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.grey),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.blue),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                                filled: true,
+                                                fillColor: Colors.grey[200],
+                                              ),
+                                              maxLines: 1,
+                                              controller: _newPin,
+                                            ),
+                                          ),
+                                        const SizedBox(height: 10),
+                                        const Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Date'),
                                         ),
+                                        Flexible(
+                                          child: TextFormField(
+                                            controller: _newDate,
+                                            decoration: InputDecoration(
+                                              isDense: true,
+                                              border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.blue),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        const Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('Status'),
+                                        ),
+                                        DropdownButton<String>(
+                                            value: selectedStatus,
+                                            onChanged: (newValue) {
+                                              setState(() {
+                                                selectedStatus = newValue!;
+
+                                                statusChanged = currentTodo
+                                                            .status ==
+                                                        'Pending' &&
+                                                    selectedStatus != 'Pending';
+                                              });
+                                            },
+                                            items: getDropdownItems(
+                                                selectedStatus),
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                            ),
+                                            dropdownColor: Colors.white),
+                                        const SizedBox(height: 10),
+                                        Visibility(
+                                          visible: isImageSelected,
+                                          child: Text(
+                                            'Image Name: ${_image?.path.split('/').last}',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(280, 40),
                                       ),
-                                      const SizedBox(height: 10),
-                                      const Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Status'),
-                                      ),
-                                      DropdownButton<String>(
-                                        value: selectedStatus,
-                                        onChanged: (newValue) {
+                                      onPressed: () {
+                                        Navigator.pop(cx);
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    Visibility(
+                                      visible: selectedStatus == 'Completed',
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(280, 40),
+                                        ),
+                                        onPressed: () async {
+                                          await _pickImageAndSaveToDB();
                                           setState(() {
-                                            selectedStatus = newValue!;
+                                            isImageSelected = true;
                                           });
                                         },
-                                        items: getDropdownItems(selectedStatus),
+                                        child: const Text('Add Image'),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    style: Constants.customButtonStyle,
-                                    onPressed: () {
-                                      Navigator.pop(cx);
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                  ElevatedButton(
-                                    style: Constants.customButtonStyle,
-                                    onPressed: () async {
-                                      // Check if the status is 'Completed' before asking for PIN
-                                      if (selectedStatus == 'Completed') {
-                                        // Ask for PIN
-                                        if (_newPin.text.isEmpty) {
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(280, 40),
+                                      ),
+                                      onPressed: () async {
+                                        if (isPinRequired() &&
+                                            (_newPin.text.isEmpty ||
+                                                _newPin.text.length != 4)) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             const SnackBar(
                                               backgroundColor: Colors.red,
                                               duration: Duration(seconds: 1),
                                               content: Text(
-                                                  'Please enter PIN for completion.'),
-                                            ),
-                                          );
-                                          return; // Do not proceed without PIN
-                                        }
-                                      }
-
-                                      // Proceed with the update logic
-                                      if (selectedStatus == 'Started') {
-                                        context.read<CrudBloc>().add(
-                                            OpenGoogleMapsEvent(
-                                                location:
-                                                    _newDescription.text));
-                                      }
-
-                                      DateTime? completedDate;
-                                      if (selectedStatus == 'Completed') {
-                                        completedDate = DateTime.now();
-                                      }
-
-                                      context.read<CrudBloc>().add(
-                                            UpdateTodo(
-                                              todo: Todo(
-                                                id: currentTodo.id,
-                                                createdTime:
-                                                    currentTodo.createdTime,
-                                                description:
-                                                    _newDescription.text,
-                                                isImportant: toggleSwitch,
-                                                number: currentTodo.number,
-                                                title: _newTitle.text,
-                                                status: selectedStatus,
-                                                pin: int.parse(_newPin.text),
-                                                date: DateFormat.yMMMEd()
-                                                    .parse(_newDate.text),
-                                                completedDate: completedDate,
-                                                imagePath: _image?.path,
+                                                'Please enter a valid 4-digit PIN for completion.',
                                               ),
-                                              userId: widget.user?.id ?? '',
                                             ),
                                           );
+                                          return;
+                                        }
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          backgroundColor: Colors.green,
-                                          duration: Duration(seconds: 1),
-                                          content: Text('Task updated'),
-                                        ),
-                                      );
+                                        if (selectedStatus == 'Started') {}
 
-                                      Navigator.popUntil(
-                                          context, (route) => route.isFirst);
-                                      context.read<CrudBloc>().add(FetchTodos(
-                                          userId: widget.user?.id ?? ''));
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => TaskPage(
-                                            user: widget.user,
+                                        DateTime? completedDate;
+                                        if (isPinRequired()) {
+                                          completedDate = DateTime.now();
+                                        }
+
+                                        context.read<CrudBloc>().add(
+                                              UpdateTodo(
+                                                todo: Todo(
+                                                  id: currentTodo.id,
+                                                  createdTime:
+                                                      currentTodo.createdTime,
+                                                  description:
+                                                      _newDescription.text,
+                                                  isImportant: toggleSwitch,
+                                                  number: currentTodo.number,
+                                                  title: _newTitle.text,
+                                                  status: selectedStatus,
+                                                  pin: isPinRequired()
+                                                      ? int.parse(_newPin.text)
+                                                      : originalPin,
+                                                  date: DateFormat.yMMMEd()
+                                                      .parse(_newDate.text),
+                                                  completedDate: completedDate,
+                                                  imagePath: _image?.path,
+                                                ),
+                                                userId: widget.user?.id ?? '',
+                                              ),
+                                            );
+
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            backgroundColor: Colors.green,
+                                            duration: Duration(seconds: 1),
+                                            content: Text('Task updated'),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text('Update'),
-                                  ),
-                                ],
+                                        );
+
+                                        Navigator.popUntil(
+                                            context, (route) => route.isFirst);
+                                        context.read<CrudBloc>().add(FetchTodos(
+                                            userId: widget.user?.id ?? ''));
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => TaskPage(
+                                              user: widget.user,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Update'),
+                                    ),
+                                  ],
+                                ),
                               );
                             }),
                           );
@@ -459,14 +511,11 @@ class _DetailsPageState extends State<DetailsPage> {
                     },
                     child: const Text('Update'),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _pickImageAndSaveToDB();
-                    },
-                    child: const Text('Add Image'),
-                  ),
                   const SizedBox(height: 10),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(280, 40),
+                    ),
                     onPressed: () {
                       _viewImage();
                     },
