@@ -32,3 +32,17 @@ class GoogleMapsOpened extends CrudState {
   @override
   List<Object> get props => [location];
 }
+
+class ImageSavedToDbState extends CrudState {
+  @override
+  List<Object> get props => [];
+}
+
+class ImageSaveToDbErrorState extends CrudState {
+  final String error;
+
+  const ImageSaveToDbErrorState({required this.error});
+
+  @override
+  List<Object> get props => [error];
+}

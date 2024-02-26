@@ -42,6 +42,7 @@ class AppDatabase {
     pin INTEGER NOT NULL,
     date TEXT NOT NULL,
     completedDate TEXT,
+    imagePath TEXT,
         FOREIGN KEY (userId) REFERENCES users(id)
 
   )
@@ -257,5 +258,15 @@ class AppDatabase {
     return List.generate(maps!.length, (i) {
       return Todo.fromMap(maps[i]);
     });
+  }
+
+  Future<void> saveImagePathToDb(int todoId, String imagePath) async {
+    // Implement the logic to save the image path to the database
+    await _database?.update(
+      'todos',
+      {'imagePath': imagePath},
+      where: '_id = ?',
+      whereArgs: [todoId],
+    );
   }
 }

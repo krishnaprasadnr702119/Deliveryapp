@@ -69,6 +69,15 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
           .readTodosByDate(event.selectedDate, userId: event.userId);
       emit(DisplayTasksByCompletedDate(todo: tasks));
     });
+
+    on<SaveImageToDbEvent>((event, emit) async {
+      try {
+        await AppDatabase().saveImagePathToDb(event.todoId, event.imagePath);
+        emit(ImageSavedToDbState());
+      } catch (e) {
+        emit(ImageSaveToDbErrorState(error: e.toString()));
+      }
+    });
   }
   Future<void> openGoogleMaps(String location) async {
     final String googleMapsUrl =

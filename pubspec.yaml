@@ -54,6 +54,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.2+1
   firebase_messaging: ^14.7.16
   shared_preferences: ^2.2.2
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

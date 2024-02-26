@@ -36,7 +36,7 @@ class AddTodo extends CrudEvent {
         status,
         pin,
         date,
-        userId
+        userId,
       ];
 }
 
@@ -135,4 +135,14 @@ class DisplayTasksByCompletedDate extends CrudState {
   const DisplayTasksByCompletedDate({required this.todo});
   @override
   List<Object> get props => [todo];
+}
+
+class SaveImageToDbEvent extends CrudEvent {
+  final int todoId;
+  final String imagePath;
+
+  const SaveImageToDbEvent({required this.todoId, required this.imagePath});
+
+  @override
+  List<Object> get props => [todoId, imagePath];
 }

@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
 import 'package:task/task/task.dart';
 import 'package:task/task/widgets/dropdown_util.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../constants/constants.dart';
 import '../models/todo.dart';
@@ -12,6 +16,7 @@ import '../widgets/custom_text.dart';
 
 class DetailsPage extends StatefulWidget {
   final User? user;
+
   const DetailsPage({Key? key, this.user}) : super(key: key);
 
   @override
@@ -26,12 +31,88 @@ class _DetailsPageState extends State<DetailsPage> {
   int originalPin = 0;
   bool toggleSwitch = false;
   String selectedStatus = 'Pending';
-  final List<String> statusOptions = [
-    'Completed',
-    'Started',
-    'Paused',
-    'Pending'
-  ];
+  File? _image;
+  final picker = ImagePicker();
+  late Todo currentTodo;
+
+  Future<void> _pickImageAndSaveToDB() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+
+      if (_image != null) {
+        int todoId = currentTodo.id!;
+        await _saveImageToDB(todoId);
+
+        // Store image path in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('imagePath_$todoId', _image!.path);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+            content: Text('Image added to DB successfully.'),
+          ),
+        );
+
+        // Navigate back to the previous page
+        Navigator.pop(context);
+      }
+    }
+  }
+
+  void _viewImage() async {
+    if (_image != null && _image!.path.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+              width: double.infinity,
+              child: Image.file(File(_image!.path)),
+            ),
+          );
+        },
+      );
+    } else {
+      print("No image available");
+
+      // Retrieve image path from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? storedImagePath = prefs.getString('imagePath_${currentTodo.id}');
+
+      if (storedImagePath != null && storedImagePath.isNotEmpty) {
+        // Use the stored image path
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Container(
+                width: double.infinity,
+                child: Image.file(File(storedImagePath)),
+              ),
+            );
+          },
+        );
+      } else {
+        print("No stored image path");
+      }
+    }
+  }
+
+  Future<void> _saveImageToDB(int todoId) async {
+    if (_image != null) {
+      String imagePath = _image!.path;
+      context.read<CrudBloc>().add(SaveImageToDbEvent(
+            todoId: todoId,
+            imagePath: imagePath,
+          ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +139,7 @@ class _DetailsPageState extends State<DetailsPage> {
         child: BlocBuilder<CrudBloc, CrudState>(
           builder: (context, state) {
             if (state is DisplaySpecificTodo) {
-              Todo currentTodo = state.todo;
+              currentTodo = state.todo;
               originalPin = currentTodo.pin;
 
               return Column(
@@ -339,6 +420,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                                 date: DateFormat.yMMMEd()
                                                     .parse(_newDate.text),
                                                 completedDate: completedDate,
+                                                imagePath: _image?.path,
                                               ),
                                               userId: widget.user?.id ?? '',
                                             ),
@@ -360,8 +442,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              TaskPage(user: widget.user),
+                                          builder: (context) => TaskPage(
+                                            user: widget.user,
+                                          ),
                                         ),
                                       );
                                     },
@@ -375,7 +458,20 @@ class _DetailsPageState extends State<DetailsPage> {
                       );
                     },
                     child: const Text('Update'),
-                  )
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _pickImageAndSaveToDB();
+                    },
+                    child: const Text('Add Image'),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      _viewImage();
+                    },
+                    child: const Text('View Image'),
+                  ),
                 ],
               );
             }

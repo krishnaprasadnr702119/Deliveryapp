@@ -17,6 +17,7 @@ class TodoFields {
     date,
     completedDate,
     userId,
+    imagePath, // New field for image path
   ];
 
   static const String id = '_id';
@@ -30,6 +31,7 @@ class TodoFields {
   static const String date = 'date';
   static const String completedDate = 'completedDate';
   static const String userId = "userId";
+  static const String imagePath = 'imagePath'; // New field for image path
 }
 
 class Todo {
@@ -44,6 +46,7 @@ class Todo {
   final DateTime date;
   final DateTime? completedDate;
   final String? userId;
+  final String? imagePath; // New field for image path
 
   Todo({
     this.id,
@@ -57,6 +60,7 @@ class Todo {
     required this.date,
     this.completedDate,
     this.userId,
+    this.imagePath, // New field for image path
   });
 
   Todo copyWith({
@@ -71,6 +75,7 @@ class Todo {
     DateTime? date,
     DateTime? completedDate,
     String? userId,
+    String? imagePath, // New field for image path
   }) {
     return Todo(
       id: id ?? this.id,
@@ -84,6 +89,7 @@ class Todo {
       date: date ?? this.date,
       completedDate: completedDate ?? this.completedDate,
       userId: userId ?? this.userId,
+      imagePath: imagePath ?? this.imagePath, // New field for image path
     );
   }
 
@@ -107,6 +113,8 @@ class Todo {
       date: _parseDate(map[TodoFields.date]),
       completedDate: _parseDate(map[TodoFields.completedDate]),
       userId: map[TodoFields.userId] as String,
+      imagePath:
+          map[TodoFields.imagePath] as String?, // New field for image path
     );
   }
 
@@ -124,6 +132,7 @@ class Todo {
             ? DateFormat('MM/dd/yy').format(completedDate!)
             : null,
         TodoFields.userId: userId,
+        TodoFields.imagePath: imagePath, // New field for image path
       };
 
   /// Helper method to parse date with custom format and error handling
@@ -132,9 +141,7 @@ class Todo {
       if (dateString is String) {
         return DateFormat('MM/dd/yy').parse(dateString);
       }
-    } catch (e) {
-      print('Error parsing date: $e');
-    }
+    } catch (e) {}
     return DateTime.now();
   }
 
