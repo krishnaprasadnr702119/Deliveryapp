@@ -31,7 +31,7 @@ class TodoFields {
   static const String date = 'date';
   static const String completedDate = 'completedDate';
   static const String userId = "userId";
-  static const String imagePath = 'imagePath'; // New field for image path
+  static const String imagePath = 'imagePath';
 }
 
 class Todo {
@@ -46,7 +46,7 @@ class Todo {
   final DateTime date;
   final DateTime? completedDate;
   final String? userId;
-  final String? imagePath; // New field for image path
+  final String? imagePath;
 
   Todo({
     this.id,
@@ -60,7 +60,7 @@ class Todo {
     required this.date,
     this.completedDate,
     this.userId,
-    this.imagePath, // New field for image path
+    this.imagePath,
   });
 
   Todo copyWith({
@@ -75,7 +75,7 @@ class Todo {
     DateTime? date,
     DateTime? completedDate,
     String? userId,
-    String? imagePath, // New field for image path
+    String? imagePath,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -89,7 +89,7 @@ class Todo {
       date: date ?? this.date,
       completedDate: completedDate ?? this.completedDate,
       userId: userId ?? this.userId,
-      imagePath: imagePath ?? this.imagePath, // New field for image path
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 
@@ -113,8 +113,7 @@ class Todo {
       date: _parseDate(map[TodoFields.date]),
       completedDate: _parseDate(map[TodoFields.completedDate]),
       userId: map[TodoFields.userId] as String,
-      imagePath:
-          map[TodoFields.imagePath] as String?, // New field for image path
+      imagePath: map[TodoFields.imagePath] as String?,
     );
   }
 
@@ -132,7 +131,7 @@ class Todo {
             ? DateFormat('MM/dd/yy').format(completedDate!)
             : null,
         TodoFields.userId: userId,
-        TodoFields.imagePath: imagePath, // New field for image path
+        TodoFields.imagePath: imagePath,
       };
 
   /// Helper method to parse date with custom format and error handling

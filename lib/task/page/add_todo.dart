@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
+import 'package:task/task/page/map.dart';
 import 'package:task/task/widgets/custom_text.dart';
 
 class AddTodoPage extends StatefulWidget {
@@ -83,6 +84,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    prefixIcon: Icon(
+                      Icons.location_on,
+                      color: Colors.white,
+                    ),
                   ),
                   onTap: () {
                     _navigateToMapScreen();
@@ -106,6 +111,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: Colors.white,
                     ),
                   ),
                   onTap: () {
@@ -241,59 +250,5 @@ class _AddTodoPageState extends State<AddTodoPage> {
             "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
       });
     }
-  }
-}
-
-class MapScreen extends StatefulWidget {
-  @override
-  _MapScreenState createState() => _MapScreenState();
-}
-
-class _MapScreenState extends State<MapScreen> {
-  late GoogleMapController mapController;
-  LatLng? selectedLocation;
-
-  @override
-  Widget build(BuildContext context) {
-    // Provide an initial camera position
-    CameraPosition initialCameraPosition = CameraPosition(
-      target: LatLng(8.5705, 76.8728), // Trivandrum Kazhakootam coordinates
-      zoom: 13.0,
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Location'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () {
-              Navigator.pop(context, selectedLocation);
-            },
-          ),
-        ],
-      ),
-      body: GoogleMap(
-        onMapCreated: (controller) {
-          mapController = controller;
-        },
-        initialCameraPosition: initialCameraPosition,
-        onTap: (LatLng location) {
-          setState(() {
-            selectedLocation = location;
-          });
-        },
-        markers: Set<Marker>.of(
-          selectedLocation != null
-              ? [
-                  Marker(
-                    markerId: MarkerId('selectedLocation'),
-                    position: selectedLocation!,
-                  ),
-                ]
-              : [],
-        ),
-      ),
-    );
   }
 }

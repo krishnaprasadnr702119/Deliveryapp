@@ -14,6 +14,7 @@ class RegistrationForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final RegistrationBloc registrationBloc =
         BlocProvider.of<RegistrationBloc>(context);
 
@@ -60,8 +61,10 @@ class RegistrationForm extends StatelessWidget {
               }
             },
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image.asset('assets/logo.png', height: 400, width: 280),
                   SizedBox(height: 16),
@@ -71,10 +74,10 @@ class RegistrationForm extends StatelessWidget {
                     passwordController: _passwordController,
                     confirmPasswordController: _confirmPasswordController,
                   ),
-                  SizedBox(height: 16),
-                  Container(
+                  SizedBox(height: size.height * 0.02),
+                  SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: size.height * 0.07,
                     child: ElevatedButton(
                       onPressed: () async {
                         final username = _usernameController.text;

@@ -5,6 +5,8 @@ import 'package:task/data/database_helper.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
+import 'package:task/task/logger.dart';
+import 'package:task/task/logger_page.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
@@ -135,6 +137,17 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               currentAccountPictureSize: Size.square(72),
             ),
             ListTile(
+              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => LoggerPage(logs: Logger.getAllLogs()),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               title: Text('Logout', style: TextStyle(color: Colors.black)),
               onTap: () {
                 Navigator.push(
@@ -193,17 +206,22 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                           Todo currentTodo = state.todo[i];
 
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               context.read<CrudBloc>().add(FetchSpecificTodo(
-                                  id: currentTodo.id!,
-                                  userId: widget.user?.id ?? ''));
-                              Navigator.push(
+                                    id: currentTodo.id!,
+                                    userId: widget.user?.id ?? '',
+                                  ));
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: ((context) =>
                                       DetailsPage(user: widget.user)),
                                 ),
                               );
+
+                              if (result == true) {
+                                _checkUserIdInSharedPreferences();
+                              }
                             },
                             child: Container(
                               height: 80,
@@ -297,6 +315,9 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   }
 
   void _deleteTask(int Id) {
+    // Log the deletion operation
+    Logger.logDeletedTask(Id);
+
     context
         .read<CrudBloc>()
         .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));

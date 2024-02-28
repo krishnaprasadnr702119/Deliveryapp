@@ -406,7 +406,13 @@ class _DetailsPageState extends State<DetailsPage> {
                                         minimumSize: Size(280, 40),
                                       ),
                                       onPressed: () {
-                                        Navigator.pop(cx);
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DetailsPage(
+                                                      user: widget.user,
+                                                    )));
                                       },
                                       child: const Text('Cancel'),
                                     ),
@@ -446,7 +452,12 @@ class _DetailsPageState extends State<DetailsPage> {
                                           return;
                                         }
 
-                                        if (selectedStatus == 'Started') {}
+                                        if (selectedStatus == 'Started') {
+                                          context.read<CrudBloc>().add(
+                                              OpenGoogleMapsEvent(
+                                                  location:
+                                                      _newDescription.text));
+                                        }
 
                                         DateTime? completedDate;
                                         if (isPinRequired()) {

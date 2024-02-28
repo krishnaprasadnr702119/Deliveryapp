@@ -50,11 +50,11 @@ dependencies:
   password_hash_plus: ^4.0.0
   google_maps_flutter: ^2.5.3
   google_maps_flutter_web: ^0.5.4+3
-  geolocator: ^10.1.1
+  geolocator:
   sqflite_common_ffi: ^2.3.2+1
-  firebase_messaging: ^14.7.16
   shared_preferences: ^2.2.2
   image_picker: ^1.0.7
+  geocoding:
 
 dev_dependencies:
   flutter_test:
