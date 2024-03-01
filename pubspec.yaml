@@ -55,6 +55,9 @@ dependencies:
   shared_preferences: ^2.2.2
   image_picker: ^1.0.7
   geocoding:
+  location: ^5.0.3
+  flutter_polyline_points: ^2.0.0
+  permission_handler: 11.3.0
 
 dev_dependencies:
   flutter_test:

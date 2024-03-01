@@ -75,66 +75,74 @@ class RegistrationForm extends StatelessWidget {
                     confirmPasswordController: _confirmPasswordController,
                   ),
                   SizedBox(height: size.height * 0.02),
-                  SizedBox(
-                    width: double.infinity,
-                    height: size.height * 0.07,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final username = _usernameController.text;
-                        final email = _emailController.text;
-                        final password = _passwordController.text;
-                        final confirmPassword = _confirmPasswordController.text;
+                  Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: size.height * 0.07,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final username = _usernameController.text;
+                            final email = _emailController.text;
+                            final password = _passwordController.text;
+                            final confirmPassword =
+                                _confirmPasswordController.text;
 
-                        final validationMessage =
-                            RegistrationValidator.validateRegistrationFields(
-                          username,
-                          email,
-                          password,
-                          confirmPassword,
-                        );
-
-                        if (validationMessage == null) {
-                          // Continue with registration logic
-                          final existingUser =
-                              await AppDatabase().getUserByEmail(email);
-
-                          if (existingUser == null) {
-                            User user = User(
-                              id: User.generateUserId(),
-                              email: email,
-                              username: username,
-                              password: password,
+                            final validationMessage = RegistrationValidator
+                                .validateRegistrationFields(
+                              username,
+                              email,
+                              password,
+                              confirmPassword,
                             );
-                            registrationBloc.add(RegistrationSubmitted(user));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(RegistrationValidator.UserExist),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        } else {
-                          // Display validation message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(validationMessage),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
 
-                        // Clear fields after registration attempt
-                        _clearFields();
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
+                            if (validationMessage == null) {
+                              // Continue with registration logic
+                              final existingUser =
+                                  await AppDatabase().getUserByEmail(email);
+
+                              if (existingUser == null) {
+                                User user = User(
+                                  id: User.generateUserId(),
+                                  email: email,
+                                  username: username,
+                                  password: password,
+                                );
+                                registrationBloc
+                                    .add(RegistrationSubmitted(user));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text(RegistrationValidator.UserExist),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            } else {
+                              // Display validation message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(validationMessage),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+
+                            // Clear fields after registration attempt
+                            _clearFields();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                          ),
+                          child: Text(
+                            RegistrationValidator.Register,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        RegistrationValidator.Register,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),

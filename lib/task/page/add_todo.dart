@@ -84,14 +84,18 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: Icon(
-                      Icons.location_on,
-                      color: Colors.white,
+                    prefixIcon: InkWell(
+                      onTap: () {
+                        _navigateToMapScreen();
+                      },
+                      child: Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  onTap: () {
-                    _navigateToMapScreen();
-                  },
+                  // Disable the default onTap behavior for the whole field
+                  onTap: () {},
                 ),
                 const SizedBox(height: 16),
                 CustomText(text: 'Pin'.toUpperCase()),
@@ -112,29 +116,31 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: Icon(
-                      Icons.calendar_today,
-                      color: Colors.white,
+                    prefixIcon: IconButton(
+                      icon: Icon(
+                        Icons.calendar_today,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Show date picker when the icon is tapped
+                        showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                        ).then((selectedDate) {
+                          if (selectedDate != null) {
+                            // Format the selected date in yyyy-MM-dd format
+                            String formattedDate =
+                                DateFormat('yyyy-MM-dd').format(selectedDate);
+                            setState(() {
+                              _dateController.text = formattedDate;
+                            });
+                          }
+                        });
+                      },
                     ),
                   ),
-                  onTap: () {
-                    // Show date picker when the text field is tapped
-                    showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2100),
-                    ).then((selectedDate) {
-                      if (selectedDate != null) {
-                        // Format the selected date in yyyy-MM-dd format
-                        String formattedDate =
-                            DateFormat('yyyy-MM-dd').format(selectedDate);
-                        setState(() {
-                          _dateController.text = formattedDate;
-                        });
-                      }
-                    });
-                  },
                 ),
                 const SizedBox(height: 16),
                 BlocBuilder<CrudBloc, CrudState>(

@@ -5,12 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/models/user.dart';
+import 'package:task/src/screen/login.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
+import 'package:task/task/page/add_todo.dart';
+import 'package:task/task/page/navigation.dart';
 import 'package:task/task/task.dart';
 import 'package:task/task/widgets/dropdown_util.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../constants/constants.dart';
 import '../models/todo.dart';
 import '../widgets/custom_text.dart';
 
@@ -127,7 +128,7 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           },
         ),
       ),
@@ -308,8 +309,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           Flexible(
                                             child: TextFormField(
                                               obscureText: true,
-                                              maxLength:
-                                                  4, // Set max length to 4 for PIN
+                                              maxLength: 4,
                                               keyboardType:
                                                   TextInputType.number,
                                               decoration: InputDecoration(
@@ -451,14 +451,38 @@ class _DetailsPageState extends State<DetailsPage> {
                                           );
                                           return;
                                         }
+                                        print(
+                                            'Selected Status: $selectedStatus');
 
                                         if (selectedStatus == 'Started') {
-                                          context.read<CrudBloc>().add(
-                                              OpenGoogleMapsEvent(
-                                                  location:
-                                                      _newDescription.text));
-                                        }
+                                          // Extract latitude and longitude from _newDescription.text
+                                          String description =
+                                              _newDescription.text;
+                                          RegExp latLngRegExp = RegExp(
+                                              r'(-?\d+\.\d+),\s*(-?\d+\.\d+)');
+                                          Match? match = latLngRegExp
+                                              .firstMatch(description);
 
+                                          if (match != null) {
+                                            double lat =
+                                                double.parse(match.group(1)!);
+                                            double lng =
+                                                double.parse(match.group(2)!);
+
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    NavigationScreen(lat, lng),
+                                              ),
+                                            );
+                                            return;
+                                          } else {
+                                            print(
+                                                "Couldn't extract latitude and longitude from description.");
+                                            return;
+                                          }
+                                        }
                                         DateTime? completedDate;
                                         if (isPinRequired()) {
                                           completedDate = DateTime.now();

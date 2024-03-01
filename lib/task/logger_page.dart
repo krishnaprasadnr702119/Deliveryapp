@@ -1,8 +1,5 @@
-// logger_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:task/src/models/user.dart';
-import 'logger.dart'; // Import your logger class or library
 
 class LoggerPage extends StatelessWidget {
   final User? user;
@@ -13,6 +10,7 @@ class LoggerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue[200],
       appBar: AppBar(
         title: Text('Logger'),
       ),

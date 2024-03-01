@@ -1,5 +1,3 @@
-// logger.dart
-
 class Logger {
   static List<String> logs = [];
 

@@ -239,19 +239,13 @@ class AppDatabase {
 
   Future<List<Todo>> readTodosByCompletedDate(DateTime selectedDate,
       {required String userId}) async {
-    final DateTime startDate =
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-    final DateTime endDate = startDate.add(Duration(days: 1));
+    DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
 
     final List<Map<String, Object?>>? maps = await _database?.query(
       todoTable,
       where:
           '${TodoFields.completedDate} >= ? AND ${TodoFields.completedDate} < ? AND ${TodoFields.userId} = ?',
-      whereArgs: [
-        startDate.toIso8601String(),
-        endDate.toIso8601String(),
-        userId
-      ],
+      whereArgs: [userId],
       orderBy: '${TodoFields.completedDate} ASC, ${TodoFields.time} ASC',
     );
 

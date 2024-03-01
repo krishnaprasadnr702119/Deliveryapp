@@ -1,9 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:task/data/database_helper.dart';
+import 'package:task/task/functions/functions.dart';
+import 'package:task/task/page/navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/todo.dart';
-
 part 'crud_event.dart';
 part 'crud_state.dart';
 
@@ -56,9 +57,9 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
       emit(DisplayTodos(todo: tasks));
     });
 
-    on<OpenGoogleMapsEvent>((event, emit) async {
-      await openGoogleMaps(event.location);
-    });
+    // on<OpenGoogleMapsEvent>((event, emit) async {
+    //   await NavigationScreen();
+    // });
     on<FetchTasksByDate>((event, emit) async {
       List<Todo> tasks = await AppDatabase()
           .readTodosByDate(event.selectedDate, userId: event.userId);
@@ -66,7 +67,7 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
     });
     on<FetchTasksByCompletedDate>((event, emit) async {
       List<Todo> tasks = await AppDatabase()
-          .readTodosByDate(event.selectedDate, userId: event.userId);
+          .readTodosByCompletedDate(event.selectedDate, userId: event.userId);
       emit(DisplayTasksByCompletedDate(todo: tasks));
     });
 
@@ -78,15 +79,5 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
         emit(ImageSaveToDbErrorState(error: e.toString()));
       }
     });
-  }
-  Future<void> openGoogleMaps(String location) async {
-    final String googleMapsUrl =
-        'https://www.google.com/maps/search/?api=1&query=$location';
-
-    if (await canLaunch(googleMapsUrl)) {
-      await launch(googleMapsUrl);
-    } else {
-      throw 'Could not open Google Maps.';
-    }
   }
 }
