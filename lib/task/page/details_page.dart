@@ -476,6 +476,31 @@ class _DetailsPageState extends State<DetailsPage> {
                                                     NavigationScreen(lat, lng),
                                               ),
                                             );
+                                            context.read<CrudBloc>().add(
+                                                  UpdateTodo(
+                                                    todo: Todo(
+                                                      id: currentTodo.id,
+                                                      createdTime: currentTodo
+                                                          .createdTime,
+                                                      description:
+                                                          _newDescription.text,
+                                                      isImportant: toggleSwitch,
+                                                      number:
+                                                          currentTodo.number,
+                                                      title: _newTitle.text,
+                                                      status: selectedStatus,
+                                                      pin: isPinRequired()
+                                                          ? int.parse(
+                                                              _newPin.text)
+                                                          : originalPin,
+                                                      date: DateFormat.yMMMEd()
+                                                          .parse(_newDate.text),
+                                                      imagePath: _image?.path,
+                                                    ),
+                                                    userId:
+                                                        widget.user?.id ?? '',
+                                                  ),
+                                                );
                                             return;
                                           } else {
                                             print(

@@ -58,6 +58,9 @@ dependencies:
   location: ^5.0.3
   flutter_polyline_points: ^2.0.0
   permission_handler: 11.3.0
+  firebase_core:
+  firebase_messaging:
+  flutter_local_notifications: ^16.3.3
 
 dev_dependencies:
   flutter_test:

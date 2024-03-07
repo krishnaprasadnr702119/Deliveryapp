@@ -4,9 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/data/database_helper.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
+import 'package:task/task/LoggerPage.dart';
 import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:task/task/logger.dart';
-import 'package:task/task/logger_page.dart';
 import 'package:task/task/models/todo.dart';
 import 'package:task/task/page/add_todo.dart';
 import 'package:task/task/page/details_page.dart';
@@ -24,6 +23,8 @@ class TaskPage extends StatefulWidget {
 class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   String? selectedFilter;
   late bool isLoading;
+  int initialTaskCount = 10;
+  int totalTaskCount = 0;
 
   @override
   void initState() {
@@ -137,22 +138,20 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               currentAccountPictureSize: Size.square(72),
             ),
             ListTile(
-              title: Text('Logger', style: TextStyle(color: Colors.black)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (c) => LoggerPage(logs: Logger.getAllLogs()),
-                  ),
-                );
-              },
-            ),
-            ListTile(
               title: Text('Logout', style: TextStyle(color: Colors.black)),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (c) => LoginPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (c) => LoggerPage()),
                 );
               },
             ),
@@ -173,6 +172,9 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
       ),
       body: BlocBuilder<CrudBloc, CrudState>(
         builder: (context, state) {
+          if (state is DisplayTodos) {
+            totalTaskCount = state.todo.length;
+          }
           return SafeArea(
             child: Container(
               padding: const EdgeInsets.all(8),
@@ -201,10 +203,11 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                   if (state is DisplayTodos && state.todo.isNotEmpty)
                     Expanded(
                       child: ListView.builder(
-                        itemCount: state.todo.length,
+                        itemCount: initialTaskCount <= state.todo.length
+                            ? initialTaskCount
+                            : state.todo.length,
                         itemBuilder: (context, i) {
                           Todo currentTodo = state.todo[i];
-
                           return GestureDetector(
                             onTap: () async {
                               context.read<CrudBloc>().add(FetchSpecificTodo(
@@ -266,6 +269,18 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                     )
                   else
                     const Text('No tasks'),
+                  if (initialTaskCount < totalTaskCount)
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          initialTaskCount += 10;
+                          if (initialTaskCount > totalTaskCount) {
+                            initialTaskCount = totalTaskCount;
+                          }
+                        });
+                      },
+                      child: Text('Load More'),
+                    ),
                 ],
               ),
             ),
@@ -315,15 +330,12 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   }
 
   void _deleteTask(int Id) {
-    // Log the deletion operation
-    Logger.logDeletedTask(Id);
-
     context
         .read<CrudBloc>()
         .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        duration: Duration(milliseconds: 500),
+        duration: Duration(seconds: 1), // Adjust as needed
         content: Text("Deleted Task"),
         backgroundColor: Colors.green,
       ),

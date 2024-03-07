@@ -25,14 +25,6 @@ class DisplaySpecificTodo extends CrudState {
   List<Object> get props => [todo];
 }
 
-class GoogleMapsOpened extends CrudState {
-  final String location;
-
-  const GoogleMapsOpened({required this.location});
-  @override
-  List<Object> get props => [location];
-}
-
 class ImageSavedToDbState extends CrudState {
   @override
   List<Object> get props => [];
@@ -45,4 +37,13 @@ class ImageSaveToDbErrorState extends CrudState {
 
   @override
   List<Object> get props => [error];
+}
+
+class DeletedTodos extends CrudState {
+  final List<Todo> deletedTodo;
+
+  DeletedTodos(this.deletedTodo);
+
+  @override
+  List<Object?> get props => [deletedTodo];
 }
