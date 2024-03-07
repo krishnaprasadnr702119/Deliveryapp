@@ -30,7 +30,6 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
     on<UpdateTodo>((event, emit) async {
       await AppDatabase().update(
         todo: event.todo.copyWith(
-          completedDate: event.completedDate,
           userId: event.userId,
         ),
       );
@@ -57,9 +56,6 @@ class CrudBloc extends Bloc<CrudEvent, CrudState> {
       emit(DisplayTodos(todo: tasks));
     });
 
-    // on<OpenGoogleMapsEvent>((event, emit) async {
-    //   await NavigationScreen();
-    // });
     on<FetchTasksByDate>((event, emit) async {
       List<Todo> tasks = await AppDatabase()
           .readTodosByDate(event.selectedDate, userId: event.userId);

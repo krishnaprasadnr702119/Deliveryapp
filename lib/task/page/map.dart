@@ -12,6 +12,7 @@ class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   LatLng? selectedLocation;
   LatLng? currentLocation;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -22,7 +23,8 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.high,
+      );
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
       });
@@ -83,7 +85,8 @@ class _MapScreenState extends State<MapScreen> {
                 markerId: MarkerId('currentLocation'),
                 position: currentLocation!,
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue),
+                  BitmapDescriptor.hueBlue,
+                ),
               ),
             if (selectedLocation != null)
               Marker(
@@ -111,6 +114,7 @@ class _MapScreenState extends State<MapScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(labelText: 'Enter location'),
                     onSubmitted: (value) {
                       Navigator.pop(context, value);
@@ -171,4 +175,10 @@ class _MapScreenState extends State<MapScreen> {
   String _confirmSearch() {
     return "Confirmed";
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: MapScreen(),
+  ));
 }

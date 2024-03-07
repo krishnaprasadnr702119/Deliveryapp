@@ -17,7 +17,7 @@ class TodoFields {
     date,
     completedDate,
     userId,
-    imagePath, // New field for image path
+    imagePath,
   ];
 
   static const String id = '_id';

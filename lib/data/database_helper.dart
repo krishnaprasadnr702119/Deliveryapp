@@ -45,6 +45,7 @@ class AppDatabase {
     imagePath TEXT,
         FOREIGN KEY (userId) REFERENCES users(id)
 
+
   )
 ''');
     } catch (e) {
@@ -182,6 +183,7 @@ class AppDatabase {
         TodoFields.date: todo.date.toIso8601String(),
         TodoFields.userId: todo.userId,
         TodoFields.completedDate: todo.completedDate?.toIso8601String(),
+        TodoFields.imagePath: todo.imagePath,
       },
       where: '${TodoFields.id} = ?',
       whereArgs: [todo.id],
@@ -246,7 +248,8 @@ class AppDatabase {
       where:
           '${TodoFields.completedDate} >= ? AND ${TodoFields.completedDate} < ? AND ${TodoFields.userId} = ?',
       whereArgs: [userId],
-      orderBy: '${TodoFields.completedDate} ASC, ${TodoFields.time} ASC',
+      orderBy:
+          '${TodoFields.completedDate} ASC, ${TodoFields.completedDate} ASC',
     );
 
     return List.generate(maps!.length, (i) {
@@ -255,12 +258,22 @@ class AppDatabase {
   }
 
   Future<void> saveImagePathToDb(int todoId, String imagePath) async {
-    // Implement the logic to save the image path to the database
     await _database?.update(
       'todos',
       {'imagePath': imagePath},
       where: '_id = ?',
       whereArgs: [todoId],
     );
+  }
+
+  Future<List<Todo>> readDeletedTodos({required String userId}) async {
+    final List<Map<String, Object?>>? maps = await _database?.query(
+      todoTable,
+      where: 'status = ? AND userId = ?',
+      whereArgs: ['deleted', userId],
+    );
+    return List.generate(maps!.length, (i) {
+      return Todo.fromMap(maps[i]);
+    });
   }
 }

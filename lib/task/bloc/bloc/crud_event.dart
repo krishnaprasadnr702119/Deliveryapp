@@ -42,20 +42,15 @@ class AddTodo extends CrudEvent {
 
 class UpdateTodo extends CrudEvent {
   final Todo todo;
-  final DateTime? completedDate;
+
   final String? userId;
 
-  const UpdateTodo(
-      {required this.todo, this.completedDate, required this.userId});
+  const UpdateTodo({
+    required this.todo,
+    required this.userId,
+  });
   @override
-  List<Object?> get props => [todo, completedDate, userId];
-
-  // Nested OpenGoogleMapsEvent
-  OpenGoogleMapsEvent openGoogleMapsEvent({
-    required String location,
-  }) {
-    return OpenGoogleMapsEvent(location: location);
-  }
+  List<Object?> get props => [todo, userId];
 }
 
 class OpenGoogleMapsEvent extends CrudEvent {
