@@ -5,13 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/src/screen/login.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:task/task/page/add_todo.dart';
-import 'package:task/task/page/navigation.dart';
-import 'package:task/task/task.dart';
-import 'package:task/task/widgets/dropdown_util.dart';
+import 'package:task/src/blocs/Task/crud_bloc.dart';
+import 'package:task/src/screen/navigation.dart';
+import 'package:task/src/screen/task.dart';
+import 'package:task/src/utils/message.dart';
+import 'package:task/src/widgets/dropdown_util.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../utils/constants.dart';
 import '../models/todo.dart';
 import '../widgets/custom_text.dart';
 
@@ -38,6 +39,14 @@ class _DetailsPageState extends State<DetailsPage> {
   bool statusChanged = false;
   bool isImageSelected = false;
 
+  void _onStatusChanged(String newStatus) {
+    setState(() {
+      selectedStatus = newStatus;
+    });
+
+    currentTodo = currentTodo.copyWith(status: newStatus);
+  }
+
   Future<void> _pickImageAndSaveToDB() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -54,10 +63,10 @@ class _DetailsPageState extends State<DetailsPage> {
         prefs.setString('imagePath_$todoId', _image!.path);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
-            content: Text('Image added to DB successfully.'),
+            content: Text(Message.image),
           ),
         );
 
@@ -128,7 +137,7 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context, true);
+            Navigator.pop(context);
           },
         ),
       ),
@@ -231,8 +240,8 @@ class _DetailsPageState extends State<DetailsPage> {
                             builder: ((context, setState) {
                               return Center(
                                 child: AlertDialog(
-                                  title: const Text(
-                                    'Update Task',
+                                  title: Text(
+                                    Message.updatetask,
                                     style: TextStyle(
                                       fontSize: 25,
                                       letterSpacing: 2,
@@ -272,9 +281,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Location'),
+                                          child: Text(Message.location),
                                         ),
                                         Flexible(
                                           child: TextFormField(
@@ -301,15 +310,16 @@ class _DetailsPageState extends State<DetailsPage> {
                                         ),
                                         const SizedBox(height: 10),
                                         if (isPinRequired())
-                                          const Align(
+                                          Align(
                                             alignment: Alignment.topLeft,
-                                            child: Text('Pin'),
+                                            child: Text(Message.pin),
                                           ),
                                         if (isPinRequired())
                                           Flexible(
                                             child: TextFormField(
                                               obscureText: true,
-                                              maxLength: 4,
+                                              maxLength:
+                                                  4, // Set max length to 4 for PIN
                                               keyboardType:
                                                   TextInputType.number,
                                               decoration: InputDecoration(
@@ -337,9 +347,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                             ),
                                           ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Date'),
+                                          child: Text(Message.date),
                                         ),
                                         Flexible(
                                           child: TextFormField(
@@ -365,28 +375,24 @@ class _DetailsPageState extends State<DetailsPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Status'),
+                                          child: Text(Message.Status),
                                         ),
                                         DropdownButton<String>(
-                                            value: selectedStatus,
-                                            onChanged: (newValue) {
-                                              setState(() {
-                                                selectedStatus = newValue!;
-
-                                                statusChanged = currentTodo
-                                                            .status ==
-                                                        'Pending' &&
-                                                    selectedStatus != 'Pending';
-                                              });
-                                            },
-                                            items: getDropdownItems(
-                                                selectedStatus),
-                                            style: const TextStyle(
-                                              color: Colors.green,
-                                            ),
-                                            dropdownColor: Colors.white),
+                                          value: selectedStatus,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              selectedStatus = newValue!;
+                                            });
+                                          },
+                                          items:
+                                              getDropdownItems(selectedStatus),
+                                          style: const TextStyle(
+                                            color: Colors.green,
+                                          ),
+                                          dropdownColor: Colors.white,
+                                        ),
                                         const SizedBox(height: 10),
                                         Visibility(
                                           visible: isImageSelected,
@@ -414,7 +420,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                                       user: widget.user,
                                                     )));
                                       },
-                                      child: const Text('Cancel'),
+                                      child: Text(Message.cancel),
                                     ),
                                     Visibility(
                                       visible: selectedStatus == 'Completed',
@@ -428,7 +434,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                             isImageSelected = true;
                                           });
                                         },
-                                        child: const Text('Add Image'),
+                                        child: Text(Message.addimage),
                                       ),
                                     ),
                                     ElevatedButton(
@@ -441,21 +447,17 @@ class _DetailsPageState extends State<DetailsPage> {
                                                 _newPin.text.length != 4)) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               backgroundColor: Colors.red,
                                               duration: Duration(seconds: 1),
-                                              content: Text(
-                                                'Please enter a valid 4-digit PIN for completion.',
-                                              ),
+                                              content: Text(Message.addpin),
                                             ),
                                           );
                                           return;
                                         }
-                                        print(
-                                            'Selected Status: $selectedStatus');
 
                                         if (selectedStatus == 'Started') {
-                                          // Extract latitude and longitude from _newDescription.text
+                                          statusChanged = true;
                                           String description =
                                               _newDescription.text;
                                           RegExp latLngRegExp = RegExp(
@@ -463,103 +465,99 @@ class _DetailsPageState extends State<DetailsPage> {
                                           Match? match = latLngRegExp
                                               .firstMatch(description);
 
-                                          if (match != null) {
-                                            double lat =
+                                          if (match == null) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: Colors.red,
+                                                duration: Duration(seconds: 1),
+                                                content:
+                                                    Text(Message.addlngandlong),
+                                              ),
+                                            );
+                                          } else {
+                                            double latitude =
                                                 double.parse(match.group(1)!);
-                                            double lng =
+                                            double longitude =
                                                 double.parse(match.group(2)!);
 
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    NavigationScreen(lat, lng),
+                                                    NavigationScreen(
+                                                        latitude, longitude),
                                               ),
                                             );
-                                            context.read<CrudBloc>().add(
-                                                  UpdateTodo(
-                                                    todo: Todo(
-                                                      id: currentTodo.id,
-                                                      createdTime: currentTodo
-                                                          .createdTime,
-                                                      description:
-                                                          _newDescription.text,
-                                                      isImportant: toggleSwitch,
-                                                      number:
-                                                          currentTodo.number,
-                                                      title: _newTitle.text,
-                                                      status: selectedStatus,
-                                                      pin: isPinRequired()
-                                                          ? int.parse(
-                                                              _newPin.text)
-                                                          : originalPin,
-                                                      date: DateFormat.yMMMEd()
-                                                          .parse(_newDate.text),
-                                                      imagePath: _image?.path,
-                                                    ),
-                                                    userId:
-                                                        widget.user?.id ?? '',
-                                                  ),
-                                                );
-                                            return;
-                                          } else {
-                                            print(
-                                                "Couldn't extract latitude and longitude from description.");
-                                            return;
                                           }
                                         }
+
                                         DateTime? completedDate;
                                         if (isPinRequired()) {
                                           completedDate = DateTime.now();
                                         }
+                                        if (currentTodo.status !=
+                                            selectedStatus) {
+                                          // Update the status in the currentTodo object
+                                          currentTodo = currentTodo.copyWith(
+                                              status: selectedStatus);
 
-                                        context.read<CrudBloc>().add(
-                                              UpdateTodo(
-                                                todo: Todo(
-                                                  id: currentTodo.id,
-                                                  createdTime:
-                                                      currentTodo.createdTime,
-                                                  description:
-                                                      _newDescription.text,
-                                                  isImportant: toggleSwitch,
-                                                  number: currentTodo.number,
-                                                  title: _newTitle.text,
-                                                  status: selectedStatus,
-                                                  pin: isPinRequired()
-                                                      ? int.parse(_newPin.text)
-                                                      : originalPin,
-                                                  date: DateFormat.yMMMEd()
-                                                      .parse(_newDate.text),
-                                                  completedDate: completedDate,
-                                                  imagePath: _image?.path,
+                                          context.read<CrudBloc>().add(
+                                                UpdateTodo(
+                                                  todo: Todo(
+                                                    id: currentTodo.id,
+                                                    createdTime:
+                                                        currentTodo.createdTime,
+                                                    description:
+                                                        _newDescription.text,
+                                                    isImportant: toggleSwitch,
+                                                    number: currentTodo.number,
+                                                    title: _newTitle.text,
+                                                    status: selectedStatus,
+                                                    pin: isPinRequired()
+                                                        ? int.parse(
+                                                            _newPin.text)
+                                                        : originalPin,
+                                                    date: DateFormat.yMMMEd()
+                                                        .parse(_newDate.text),
+                                                    completedDate:
+                                                        completedDate,
+                                                    imagePath: _image?.path,
+                                                    userId:
+                                                        widget.user?.id ?? '',
+                                                  ),
+                                                  userId: widget.user?.id ?? '',
                                                 ),
-                                                userId: widget.user?.id ?? '',
-                                              ),
-                                            );
+                                              );
 
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            backgroundColor: Colors.green,
-                                            duration: Duration(seconds: 1),
-                                            content: Text('Task updated'),
-                                          ),
-                                        );
-
-                                        Navigator.popUntil(
-                                            context, (route) => route.isFirst);
-                                        context.read<CrudBloc>().add(FetchTodos(
-                                            userId: widget.user?.id ?? ''));
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => TaskPage(
-                                              user: widget.user,
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: Colors.green,
+                                              duration: Duration(seconds: 1),
+                                              content:
+                                                  Text(Message.taskupdated),
                                             ),
-                                          ),
-                                        );
+                                          );
+
+                                          Navigator.popUntil(context,
+                                              (route) => route.isFirst);
+
+                                          context.read<CrudBloc>().add(
+                                              FetchTodos(
+                                                  userId:
+                                                      widget.user?.id ?? ''));
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => TaskPage(
+                                                user: widget.user,
+                                              ),
+                                            ),
+                                          );
+                                        }
                                       },
-                                      child: const Text('Update'),
+                                      child: Text(Message.update),
                                     ),
                                   ],
                                 ),
@@ -569,7 +567,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         },
                       );
                     },
-                    child: const Text('Update'),
+                    child: Text(Message.update),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -579,7 +577,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     onPressed: () {
                       _viewImage();
                     },
-                    child: const Text('View Image'),
+                    child: Text(Message.viewimage),
                   ),
                 ],
               );

@@ -1,4 +1,4 @@
-class RegistrationValidator {
+class Message {
   static var RegistrationSucces = "Registration successful";
   static var RegistrationFailed = "Registration failed";
   static var LoginFailed = "Login failed";
@@ -8,9 +8,33 @@ class RegistrationValidator {
   static var Login = "Login";
   static var Forget = " Forget Password";
   static var account = "Create an account";
-
   static var Forgetpassword = "Forget Password successful";
   static var Forgetpasswordfailed = "Forget Password failed";
+  static var logs = 'Logs';
+  static var userid = 'User ID';
+  static var Status = 'Status';
+  static var OrderNumber = 'Order Number';
+  static var created = 'Created';
+  static var expected = 'Expected Date to Completed';
+  static var Nologs = 'No logs';
+  static var completed = 'Completed';
+  static var image = 'Image added to DB successfully.';
+  static var updatetask = 'Update Task';
+  static var location = 'Location';
+  static var pin = 'Pin';
+  static var date = 'Date';
+  static var cancel = 'Cancel';
+  static var addimage = 'Add Image';
+  static var addpin = 'Please enter a valid 4-digit PIN for completion.';
+  static var addlngandlong =
+      'Please enter a valid location for the task. (Format: latitude, longitude)';
+  static var taskupdated = 'Task updated';
+  static var update = "Update";
+  static var viewimage = 'View Image';
+  static var tasksuccess = "Task successfully";
+  static var allfill = "All fields must be filled";
+  static var sumbit = "Sumbit";
+  static var deleted = "Deleted Task";
 
   static String? validateRegistrationFields(
     String username,

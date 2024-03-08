@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -21,15 +22,23 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        currentLocation = LatLng(position.latitude, position.longitude);
-      });
-    } catch (e) {
-      print("Error getting current location: $e");
+    // Check if location permission is granted
+    var status = await Permission.location.request();
+
+    if (status.isGranted) {
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        setState(() {
+          currentLocation = LatLng(position.latitude, position.longitude);
+        });
+      } catch (e) {
+        print("Error getting current location: $e");
+      }
+    } else {
+      print("Location permission denied");
+      // Handle the case where the user denies location permission
     }
   }
 
@@ -175,10 +184,4 @@ class _MapScreenState extends State<MapScreen> {
   String _confirmSearch() {
     return "Confirmed";
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: MapScreen(),
-  ));
 }

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/screen/forgetpassword.dart';
-import 'package:task/src/login/bloc/login_bloc.dart';
+import 'package:task/src/blocs/Login/login_bloc.dart';
 import 'package:task/src/models/login_helper.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/src/screen/registration.dart';
 import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/login_fields.dart';
-import 'package:task/task/task.dart';
+import 'package:task/src/screen/task.dart';
 
 class LoginPage extends StatelessWidget {
   final _usernameController = TextEditingController();
@@ -52,8 +52,7 @@ class LoginPage extends StatelessWidget {
                 } else if (state is LoginFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                          '${RegistrationValidator.LoginFailed} ${state.error}'),
+                      content: Text('${Message.LoginFailed} ${state.error}'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -86,7 +85,7 @@ class LoginPage extends StatelessWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(RegistrationValidator.fill),
+                                content: Text(Message.fill),
                               ),
                             );
                           }
@@ -96,7 +95,7 @@ class LoginPage extends StatelessWidget {
                               MaterialStateProperty.all(Colors.blue),
                         ),
                         child: Text(
-                          RegistrationValidator.Login,
+                          Message.Login,
                           style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
                       ),
@@ -114,7 +113,7 @@ class LoginPage extends StatelessWidget {
                             );
                           },
                           child: Text(
-                            RegistrationValidator.Forget,
+                            Message.Forget,
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -127,7 +126,7 @@ class LoginPage extends StatelessWidget {
                             );
                           },
                           child: Text(
-                            RegistrationValidator.account,
+                            Message.account,
                             style: TextStyle(color: Colors.white),
                           ),
                         )

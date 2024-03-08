@@ -101,8 +101,8 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fcmToken = await _firebaseMessaging.getToken();
     print('FCM Token: $fcmToken');
-    await setupFlutterNotifications();
-    initLocalNotification();
-    InitPushNotification();
+    // await setupFlutterNotifications();
+    // initLocalNotification();
+    // InitPushNotification();
   }
 }
