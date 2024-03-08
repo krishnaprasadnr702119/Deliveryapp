@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:task/data/database_helper.dart';
-import 'package:task/task/functions/functions.dart';
-import 'package:task/task/page/navigation.dart';
+import 'package:task/src/data/database_helper.dart';
+import 'package:task/src/utils/functions.dart';
+import 'package:task/src/screen/navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../models/todo.dart';
 part 'crud_event.dart';

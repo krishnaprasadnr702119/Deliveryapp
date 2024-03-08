@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task/FirebaseApi.dart';
-import 'package:task/data/database_helper.dart';
-import 'package:task/src/forgetpassword/forgetpassword_bloc.dart';
-import 'package:task/src/login/bloc/login_bloc.dart';
+import 'package:task/src/utils/FirebaseApi.dart';
+import 'package:task/src/data/database_helper.dart';
+import 'package:task/src/utils/firebase_options.dart';
+import 'package:task/src/blocs/Forget_Password/forgetpassword_bloc.dart';
+import 'package:task/src/blocs/Login/login_bloc.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/screen/splashscreen.dart';
-import 'package:task/src/signup/bloc/registration_bloc.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
+import 'package:task/src/blocs/SignUp/registration_bloc.dart';
+import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
-  // await FirebaseApi().initNotification();
-  var status = await Permission.location.request();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  if (status.isGranted) {
-    await AppDatabase().initDatabase();
-    runApp(MyApp());
-  } else {
-    print('Location permission is denied');
-  }
+  await FirebaseApi().initNotification();
+  await AppDatabase().initDatabase();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

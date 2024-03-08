@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task/data/database_helper.dart';
+import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/src/signup/bloc/registration_bloc.dart';
+import 'package:task/src/blocs/SignUp/registration_bloc.dart';
 import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/registration_fields.dart';
 
@@ -41,7 +41,7 @@ class RegistrationForm extends StatelessWidget {
                 // Show Snackbar after a successful registration
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(RegistrationValidator.RegistrationSucces),
+                    content: Text(Message.RegistrationSucces),
                     duration: Duration(seconds: 2),
                     backgroundColor: Colors.green,
                   ),
@@ -52,8 +52,8 @@ class RegistrationForm extends StatelessWidget {
                 // Show Snackbar for registration failure
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                        '${RegistrationValidator.RegistrationFailed} ${state.error}'),
+                    content:
+                        Text('${Message.RegistrationFailed} ${state.error}'),
                     duration: Duration(seconds: 2),
                     backgroundColor: Colors.red,
                   ),
@@ -88,8 +88,8 @@ class RegistrationForm extends StatelessWidget {
                             final confirmPassword =
                                 _confirmPasswordController.text;
 
-                            final validationMessage = RegistrationValidator
-                                .validateRegistrationFields(
+                            final validationMessage =
+                                Message.validateRegistrationFields(
                               username,
                               email,
                               password,
@@ -113,8 +113,7 @@ class RegistrationForm extends StatelessWidget {
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content:
-                                        Text(RegistrationValidator.UserExist),
+                                    content: Text(Message.UserExist),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -137,7 +136,7 @@ class RegistrationForm extends StatelessWidget {
                                 MaterialStateProperty.all(Colors.blue),
                           ),
                           child: Text(
-                            RegistrationValidator.Register,
+                            Message.Register,
                             style: TextStyle(fontSize: 16),
                           ),
                         ),

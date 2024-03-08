@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:task/task/page/map.dart';
-import 'package:task/task/widgets/custom_text.dart';
+import 'package:task/src/blocs/Task/crud_bloc.dart';
+import 'package:task/src/screen/map.dart';
+import 'package:task/src/widgets/custom_text.dart';
 
 class AddTodoPage extends StatefulWidget {
   final User? user;

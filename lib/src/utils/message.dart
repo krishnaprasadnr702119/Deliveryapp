@@ -1,4 +1,4 @@
-class RegistrationValidator {
+class Message {
   static var RegistrationSucces = "Registration successful";
   static var RegistrationFailed = "Registration failed";
   static var LoginFailed = "Login failed";
@@ -8,9 +8,16 @@ class RegistrationValidator {
   static var Login = "Login";
   static var Forget = " Forget Password";
   static var account = "Create an account";
-
   static var Forgetpassword = "Forget Password successful";
   static var Forgetpasswordfailed = "Forget Password failed";
+  static var logs = 'Logs';
+  static var userid = 'User ID';
+  static var Status = 'Status';
+  static var OrderNumber = 'Order Number';
+  static var created = 'Created';
+  static var expected = 'Expected Date to Completed';
+  static var Nologs = 'No logs';
+  static var completed = 'Completed';
 
   static String? validateRegistrationFields(
     String username,

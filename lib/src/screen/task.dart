@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task/data/database_helper.dart';
+import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/task/LoggerPage.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:task/task/models/todo.dart';
-import 'package:task/task/page/add_todo.dart';
-import 'package:task/task/page/details_page.dart';
-import 'package:task/task/widgets/statuscolor.dart';
+import 'package:task/src/blocs/Task/crud_bloc.dart';
+import 'package:task/src/models/todo.dart';
+import 'package:task/src/screen/add_todo.dart';
+import 'package:task/src/screen/details_page.dart';
+import 'package:task/src/widgets/statuscolor.dart';
+import 'package:task/src/screen/LoggerPage.dart';
 
 class TaskPage extends StatefulWidget {
   final User? user;
@@ -151,7 +151,10 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (c) => LoggerPage()),
+                  MaterialPageRoute(
+                      builder: (c) => LoggerPage(
+                            user: widget.user,
+                          )),
                 );
               },
             ),

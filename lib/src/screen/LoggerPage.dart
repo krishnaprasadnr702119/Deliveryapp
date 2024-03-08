@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task/data/database_helper.dart';
+import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
-import 'package:task/task/bloc/bloc/crud_bloc.dart';
-import 'package:task/task/models/todo.dart';
-import 'package:task/task/page/add_todo.dart';
-import 'package:task/task/page/details_page.dart';
-import 'package:task/task/widgets/statuscolor.dart';
+import 'package:task/src/blocs/Task/crud_bloc.dart';
+import 'package:task/src/models/todo.dart';
+import 'package:task/src/screen/add_todo.dart';
+import 'package:task/src/screen/details_page.dart';
+import 'package:task/src/utils/message.dart';
+import 'package:task/src/widgets/statuscolor.dart';
 
 class LoggerPage extends StatefulWidget {
   final User? user;
@@ -72,8 +73,8 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text(
-          'Logs',
+        title: Text(
+          Message.logs,
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -119,32 +120,32 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'User ID : ${(currentTodo.userId!)}',
+                                    '${(Message.userid)} : ${(currentTodo.userId!)}',
                                     style: const TextStyle(
                                       color: Colors.black,
                                     ),
                                   ),
                                   Text(
-                                    'Status: ${currentTodo.status}',
+                                    '${(Message.Status)}: ${currentTodo.status}',
                                     style: const TextStyle(
                                       color: Colors.black,
                                     ),
                                   ),
                                   Text(
-                                    'Order Number : ${(currentTodo.id)}',
+                                    '${(Message.OrderNumber)} : ${(currentTodo.id)}',
                                     style: const TextStyle(
                                       color: Colors.black,
                                     ),
                                   ),
                                   Text(
-                                    'Created: ${(currentTodo.createdTime)}',
+                                    '${(Message.created)}: ${(currentTodo.createdTime)}',
                                     style: const TextStyle(
                                       color: Colors.black,
                                     ),
                                   ),
                                   if (currentTodo.completedDate != null)
                                     Text(
-                                      'Expected Date to Completed: ${(currentTodo.completedDate!)}',
+                                      '${(Message.expected)}: ${(currentTodo.completedDate!)}',
                                       style: const TextStyle(
                                         color: Colors.black,
                                       ),
@@ -157,7 +158,7 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
                       ),
                     )
                   else
-                    const Text('No logs'),
+                    Text(Message.Nologs),
                 ],
               ),
             ),

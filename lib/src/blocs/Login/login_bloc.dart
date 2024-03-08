@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:task/data/database_helper.dart';
+import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/src/models/login_helper.dart';
 

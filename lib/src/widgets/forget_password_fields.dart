@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task/src/forgetpassword/forgetpassword_bloc.dart';
-import 'package:task/data/database_helper.dart';
+import 'package:task/src/blocs/Forget_Password/forgetpassword_bloc.dart';
+import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/src/widgets/password_custom_text_field.dart';
 

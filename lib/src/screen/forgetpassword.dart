@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task/src/forgetpassword/forgetpassword_bloc.dart';
+import 'package:task/src/blocs/Forget_Password/forgetpassword_bloc.dart';
 import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/forget_password_fields.dart';
 
@@ -34,7 +34,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
               if (state is ForgetPasswordSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(RegistrationValidator.Forgetpassword),
+                    content: Text(Message.Forgetpassword),
                     duration: Duration(seconds: 2),
                     backgroundColor: Colors.green,
                   ),
@@ -42,8 +42,8 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
               } else if (state is ForgetPasswordFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                        '${RegistrationValidator.Forgetpasswordfailed} ${state.error}'),
+                    content:
+                        Text('${Message.Forgetpasswordfailed} ${state.error}'),
                     duration: Duration(seconds: 2),
                     backgroundColor: Colors.green,
                   ),
