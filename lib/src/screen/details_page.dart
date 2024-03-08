@@ -8,6 +8,7 @@ import 'package:task/src/models/user.dart';
 import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:task/src/screen/navigation.dart';
 import 'package:task/src/screen/task.dart';
+import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/dropdown_util.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -62,10 +63,10 @@ class _DetailsPageState extends State<DetailsPage> {
         prefs.setString('imagePath_$todoId', _image!.path);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
-            content: Text('Image added to DB successfully.'),
+            content: Text(Message.image),
           ),
         );
 
@@ -239,8 +240,8 @@ class _DetailsPageState extends State<DetailsPage> {
                             builder: ((context, setState) {
                               return Center(
                                 child: AlertDialog(
-                                  title: const Text(
-                                    'Update Task',
+                                  title: Text(
+                                    Message.updatetask,
                                     style: TextStyle(
                                       fontSize: 25,
                                       letterSpacing: 2,
@@ -280,9 +281,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Location'),
+                                          child: Text(Message.location),
                                         ),
                                         Flexible(
                                           child: TextFormField(
@@ -309,9 +310,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                         ),
                                         const SizedBox(height: 10),
                                         if (isPinRequired())
-                                          const Align(
+                                          Align(
                                             alignment: Alignment.topLeft,
-                                            child: Text('Pin'),
+                                            child: Text(Message.pin),
                                           ),
                                         if (isPinRequired())
                                           Flexible(
@@ -346,9 +347,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                             ),
                                           ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Date'),
+                                          child: Text(Message.date),
                                         ),
                                         Flexible(
                                           child: TextFormField(
@@ -374,9 +375,9 @@ class _DetailsPageState extends State<DetailsPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 10),
-                                        const Align(
+                                        Align(
                                           alignment: Alignment.topLeft,
-                                          child: Text('Status'),
+                                          child: Text(Message.Status),
                                         ),
                                         DropdownButton<String>(
                                           value: selectedStatus,
@@ -419,7 +420,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                                       user: widget.user,
                                                     )));
                                       },
-                                      child: const Text('Cancel'),
+                                      child: Text(Message.cancel),
                                     ),
                                     Visibility(
                                       visible: selectedStatus == 'Completed',
@@ -433,7 +434,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                             isImageSelected = true;
                                           });
                                         },
-                                        child: const Text('Add Image'),
+                                        child: Text(Message.addimage),
                                       ),
                                     ),
                                     ElevatedButton(
@@ -446,12 +447,10 @@ class _DetailsPageState extends State<DetailsPage> {
                                                 _newPin.text.length != 4)) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               backgroundColor: Colors.red,
                                               duration: Duration(seconds: 1),
-                                              content: Text(
-                                                'Please enter a valid 4-digit PIN for completion.',
-                                              ),
+                                              content: Text(Message.addpin),
                                             ),
                                           );
                                           return;
@@ -469,12 +468,11 @@ class _DetailsPageState extends State<DetailsPage> {
                                           if (match == null) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
-                                              const SnackBar(
+                                              SnackBar(
                                                 backgroundColor: Colors.red,
                                                 duration: Duration(seconds: 1),
-                                                content: Text(
-                                                  'Please enter a valid location for the task. (Format: latitude, longitude)',
-                                                ),
+                                                content:
+                                                    Text(Message.addlngandlong),
                                               ),
                                             );
                                           } else {
@@ -534,10 +532,11 @@ class _DetailsPageState extends State<DetailsPage> {
 
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            const SnackBar(
+                                            SnackBar(
                                               backgroundColor: Colors.green,
                                               duration: Duration(seconds: 1),
-                                              content: Text('Task updated'),
+                                              content:
+                                                  Text(Message.taskupdated),
                                             ),
                                           );
 
@@ -558,7 +557,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           );
                                         }
                                       },
-                                      child: const Text('Update'),
+                                      child: Text(Message.update),
                                     ),
                                   ],
                                 ),
@@ -568,7 +567,7 @@ class _DetailsPageState extends State<DetailsPage> {
                         },
                       );
                     },
-                    child: const Text('Update'),
+                    child: Text(Message.update),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -578,7 +577,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     onPressed: () {
                       _viewImage();
                     },
-                    child: const Text('View Image'),
+                    child: Text(Message.viewimage),
                   ),
                 ],
               );

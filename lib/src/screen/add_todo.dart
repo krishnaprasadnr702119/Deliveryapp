@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:task/src/screen/map.dart';
+import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/custom_text.dart';
 
 class AddTodoPage extends StatefulWidget {
@@ -185,9 +186,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                                         ),
                                       );
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       duration: Duration(seconds: 1),
-                                      content: Text("Task successfully"),
+                                      content: Text(Message.tasksuccess),
                                       backgroundColor: Colors.green,
                                     ),
                                   );
@@ -208,7 +209,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("All fields must be filled"),
+                                content: Text(Message.allfill),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -229,7 +230,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                             Size(400, 60),
                           ),
                         ),
-                        child: const Text('Submit'),
+                        child: Text(Message.sumbit),
                       ),
                     );
                   },
