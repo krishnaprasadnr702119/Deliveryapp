@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:task/src/models/user.dart';
@@ -66,7 +67,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomText(text: 'order'.toUpperCase()),
+                CustomText(text: 'order name'.toUpperCase()),
                 TextFormField(
                   controller: _title,
                   style: TextStyle(color: Colors.white),
@@ -80,23 +81,24 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 CustomText(text: 'location'.toUpperCase()),
                 TextFormField(
                   controller: _locationController,
+                  readOnly: true,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
+                    hintText: 'Select location',
+                    hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: InkWell(
+                    suffixIcon: InkWell(
                       onTap: () {
                         _navigateToMapScreen();
                       },
                       child: Icon(
-                        Icons.location_on,
+                        Icons.map,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  // Disable the default onTap behavior for the whole field
-                  onTap: () {},
                 ),
                 const SizedBox(height: 16),
                 CustomText(text: 'Pin'.toUpperCase()),
@@ -112,12 +114,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
                 CustomText(text: 'date'.toUpperCase()),
                 TextFormField(
                   controller: _dateController,
+                  readOnly: true,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
+                    hintText: 'Select date',
+                    hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    prefixIcon: IconButton(
+                    suffixIcon: IconButton(
                       icon: Icon(
                         Icons.calendar_today,
                         color: Colors.white,
@@ -230,7 +235,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                             Size(400, 60),
                           ),
                         ),
-                        child: Text(Message.sumbit),
+                        child: Text(Message.submit),
                       ),
                     );
                   },
@@ -252,10 +257,33 @@ class _AddTodoPageState extends State<AddTodoPage> {
     );
 
     if (selectedLocation != null) {
-      setState(() {
-        _locationController.text =
-            "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
-      });
+      try {
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          selectedLocation.latitude,
+          selectedLocation.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          String placeName = placemarks[0].name ?? '';
+          String locality = placemarks[0].locality ?? '';
+          String country = placemarks[0].country ?? '';
+
+          setState(() {
+            _locationController.text = "$placeName, $locality, $country";
+          });
+        } else {
+          setState(() {
+            _locationController.text =
+                "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
+          });
+        }
+      } catch (e) {
+        print("Error fetching placemarks: $e");
+        setState(() {
+          _locationController.text =
+              "(${selectedLocation.latitude}, ${selectedLocation.longitude})";
+        });
+      }
     }
   }
 }

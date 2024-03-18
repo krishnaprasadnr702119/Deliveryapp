@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/data/database_helper.dart';
-import 'package:task/src/screen/login.dart';
 import 'package:task/src/models/user.dart';
 import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:task/src/models/todo.dart';
-import 'package:task/src/screen/add_todo.dart';
-import 'package:task/src/screen/details_page.dart';
 import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/statuscolor.dart';
 

@@ -26,7 +26,18 @@ class RegistrationForm extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Container(
           decoration: BoxDecoration(
@@ -66,8 +77,8 @@ class RegistrationForm extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logo.png', height: 400, width: 280),
-                  SizedBox(height: 16),
+                  Image.asset('assets/logo.png', height: 390, width: 280),
+                  SizedBox(height: 8),
                   RegistrationFields(
                     usernameController: _usernameController,
                     emailController: _emailController,
@@ -77,67 +88,69 @@ class RegistrationForm extends StatelessWidget {
                   SizedBox(height: size.height * 0.02),
                   Column(
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        height: size.height * 0.07,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final username = _usernameController.text;
-                            final email = _emailController.text;
-                            final password = _passwordController.text;
-                            final confirmPassword =
-                                _confirmPasswordController.text;
+                      Center(
+                        child: Container(
+                          width: double.infinity,
+                          height: size.height * 0.07,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final username = _usernameController.text;
+                              final email = _emailController.text;
+                              final password = _passwordController.text;
+                              final confirmPassword =
+                                  _confirmPasswordController.text;
 
-                            final validationMessage =
-                                Message.validateRegistrationFields(
-                              username,
-                              email,
-                              password,
-                              confirmPassword,
-                            );
+                              final validationMessage =
+                                  Message.validateRegistrationFields(
+                                username,
+                                email,
+                                password,
+                                confirmPassword,
+                              );
 
-                            if (validationMessage == null) {
-                              // Continue with registration logic
-                              final existingUser =
-                                  await AppDatabase().getUserByEmail(email);
+                              if (validationMessage == null) {
+                                // Continue with registration logic
+                                final existingUser =
+                                    await AppDatabase().getUserByEmail(email);
 
-                              if (existingUser == null) {
-                                User user = User(
-                                  id: User.generateUserId(),
-                                  email: email,
-                                  username: username,
-                                  password: password,
-                                );
-                                registrationBloc
-                                    .add(RegistrationSubmitted(user));
+                                if (existingUser == null) {
+                                  User user = User(
+                                    id: User.generateUserId(),
+                                    email: email,
+                                    username: username,
+                                    password: password,
+                                  );
+                                  registrationBloc
+                                      .add(RegistrationSubmitted(user));
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(Message.UserExist),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               } else {
+                                // Display validation message
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(Message.UserExist),
+                                    content: Text(validationMessage),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
                               }
-                            } else {
-                              // Display validation message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(validationMessage),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
 
-                            // Clear fields after registration attempt
-                            _clearFields();
-                          },
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.blue),
-                          ),
-                          child: Text(
-                            Message.Register,
-                            style: TextStyle(fontSize: 16),
+                              // Clear fields after registration attempt
+                              _clearFields();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue),
+                            ),
+                            child: Text(
+                              Message.Register,
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                         ),
                       ),

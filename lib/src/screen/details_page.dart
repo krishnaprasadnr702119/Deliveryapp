@@ -137,7 +137,14 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TaskPage(
+                  user: widget.user,
+                ),
+              ),
+            );
           },
         ),
       ),
@@ -318,8 +325,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           Flexible(
                                             child: TextFormField(
                                               obscureText: true,
-                                              maxLength:
-                                                  4, // Set max length to 4 for PIN
+                                              maxLength: 4,
                                               keyboardType:
                                                   TextInputType.number,
                                               decoration: InputDecoration(
@@ -455,41 +461,18 @@ class _DetailsPageState extends State<DetailsPage> {
                                           );
                                           return;
                                         }
-
                                         if (selectedStatus == 'Started') {
                                           statusChanged = true;
                                           String description =
                                               _newDescription.text;
-                                          RegExp latLngRegExp = RegExp(
-                                              r'(-?\d+\.\d+),\s*(-?\d+\.\d+)');
-                                          Match? match = latLngRegExp
-                                              .firstMatch(description);
 
-                                          if (match == null) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                backgroundColor: Colors.red,
-                                                duration: Duration(seconds: 1),
-                                                content:
-                                                    Text(Message.addlngandlong),
-                                              ),
-                                            );
-                                          } else {
-                                            double latitude =
-                                                double.parse(match.group(1)!);
-                                            double longitude =
-                                                double.parse(match.group(2)!);
-
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    NavigationScreen(
-                                                        latitude, longitude),
-                                              ),
-                                            );
-                                          }
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NavigationScreen(description),
+                                            ),
+                                          );
                                         }
 
                                         DateTime? completedDate;

@@ -18,7 +18,18 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
         BlocProvider.of<ForgetPasswordBloc>(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,

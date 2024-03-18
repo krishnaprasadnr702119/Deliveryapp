@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigatetohome() async {
-    await Future.delayed(const Duration(milliseconds: 3000), () {});
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
@@ -26,8 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Container(
-          width: 200, // Specify the width of the logo
-          height: 200, // Specify the height of the logo
+          width: 200,
+          height: 200,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/amazon.png'),
