@@ -21,8 +21,7 @@ class AppDatabase {
 
   Future<void> _createDb(Database db, int version) async {
     try {
-      await db.execute(
-          '''
+      await db.execute('''
         CREATE TABLE users (
           id TEXT PRIMARY KEY, 
           username TEXT,
@@ -30,8 +29,7 @@ class AppDatabase {
           password TEXT
         )
       ''');
-      await db.execute(
-          '''
+      await db.execute('''
     CREATE TABLE todos ( 
       userId TEXT,
     _id INTEGER PRIMARY KEY AUTOINCREMENT, 

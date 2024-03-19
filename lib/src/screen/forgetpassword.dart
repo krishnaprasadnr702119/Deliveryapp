@@ -1,5 +1,3 @@
-// forget_password_form.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task/src/blocs/Forget_Password/forgetpassword_bloc.dart';
@@ -18,7 +16,21 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
         BlocProvider.of<ForgetPasswordBloc>(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,

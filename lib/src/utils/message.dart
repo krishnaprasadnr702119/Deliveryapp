@@ -33,8 +33,10 @@ class Message {
   static var viewimage = 'View Image';
   static var tasksuccess = "Task successfully";
   static var allfill = "All fields must be filled";
-  static var sumbit = "Sumbit";
+  static var submit = "Submit";
   static var deleted = "Deleted Task";
+  static var deleteconf = "Confirm Deletion";
+  static var confdelete = "Are you sure you want to delete this task?";
 
   static String? validateRegistrationFields(
     String username,

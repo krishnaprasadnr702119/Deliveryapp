@@ -8,7 +8,6 @@ import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:task/src/models/todo.dart';
 import 'package:task/src/screen/add_todo.dart';
 import 'package:task/src/screen/details_page.dart';
-import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/statuscolor.dart';
 import 'package:task/src/screen/LoggerPage.dart';
 
@@ -82,11 +81,22 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_list, color: Colors.white),
             onSelected: (String value) {
               _applyFilter(value);
             },
             itemBuilder: (BuildContext context) {
               return [
+                PopupMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    'Filter',
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  ),
+                ),
                 const PopupMenuItem<String>(
                   value: 'Completed',
                   child: Text('Completed Tasks'),
@@ -139,16 +149,9 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               currentAccountPictureSize: Size.square(72),
             ),
             ListTile(
-              title: Text('Logout', style: TextStyle(color: Colors.black)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (c) => LoginPage()),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              title: Text('Logger',
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -159,20 +162,19 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                 );
               },
             ),
+            ListTile(
+              title: Text('Logout',
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (c) => LoginPage()),
+                );
+              },
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add,
-          color: Colors.black87,
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (c) => AddTodoPage(user: widget.user)),
-          );
-        },
       ),
       body: BlocBuilder<CrudBloc, CrudState>(
         builder: (context, state) {
@@ -194,14 +196,14 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                   SingleChildScrollView(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            _applyFilter(null);
-                          },
-                          child: const Text('All Tasks'),
-                        ),
-                      ],
+                      // children: [
+                      //   ElevatedButton(
+                      //     onPressed: () {
+                      //       _applyFilter(null);
+                      //     },
+                      //     child: const Text('All Tasks'),
+                      //   ),
+                      // ],
                     ),
                   ),
                   if (state is DisplayTodos && state.todo.isNotEmpty)
@@ -291,6 +293,25 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
           );
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => AddTodoPage(user: widget.user)),
+            );
+          },
+          child: Text(
+            'Add Task',
+            style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 20),
+          ),
+        ),
+      ),
     );
   }
 
@@ -333,41 +354,14 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
     }
   }
 
-  void _deleteTask(int id) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(Message.deleteconf),
-          content: Text(Message.confdele),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(Message.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _performDeleteTask(id);
-              },
-              child: Text(Message.deleted),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _performDeleteTask(int id) {
+  void _deleteTask(int Id) {
     context
         .read<CrudBloc>()
-        .add(DeleteTodo(id: id, userId: widget.user?.id ?? ''));
+        .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         duration: Duration(seconds: 1),
-        content: Text(Message.deleted),
+        content: Text("Deleted Task"),
         backgroundColor: Colors.green,
       ),
     );

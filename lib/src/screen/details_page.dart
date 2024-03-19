@@ -48,7 +48,52 @@ class _DetailsPageState extends State<DetailsPage> {
   }
 
   Future<void> _pickImageAndSaveToDB() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    // Show a dialog to choose between gallery and camera
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Image Source"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: Row(
+                    children: [
+                      Icon(Icons.photo_library),
+                      SizedBox(width: 8),
+                      Text("Gallery"),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _getImageFromSource(ImageSource.gallery);
+                  },
+                ),
+                Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: Row(
+                    children: [
+                      Icon(Icons.camera_alt),
+                      SizedBox(width: 8),
+                      Text("Camera"),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _getImageFromSource(ImageSource.camera);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getImageFromSource(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
@@ -137,7 +182,14 @@ class _DetailsPageState extends State<DetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TaskPage(
+                  user: widget.user,
+                ),
+              ),
+            );
           },
         ),
       ),
@@ -318,8 +370,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           Flexible(
                                             child: TextFormField(
                                               obscureText: true,
-                                              maxLength:
-                                                  4, // Set max length to 4 for PIN
+                                              maxLength: 4,
                                               keyboardType:
                                                   TextInputType.number,
                                               decoration: InputDecoration(
@@ -394,15 +445,6 @@ class _DetailsPageState extends State<DetailsPage> {
                                           dropdownColor: Colors.white,
                                         ),
                                         const SizedBox(height: 10),
-                                        Visibility(
-                                          visible: isImageSelected,
-                                          child: Text(
-                                            'Image Name: ${_image?.path.split('/').last}',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   ),
@@ -455,41 +497,18 @@ class _DetailsPageState extends State<DetailsPage> {
                                           );
                                           return;
                                         }
-
                                         if (selectedStatus == 'Started') {
                                           statusChanged = true;
                                           String description =
                                               _newDescription.text;
-                                          RegExp latLngRegExp = RegExp(
-                                              r'(-?\d+\.\d+),\s*(-?\d+\.\d+)');
-                                          Match? match = latLngRegExp
-                                              .firstMatch(description);
 
-                                          if (match == null) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                backgroundColor: Colors.red,
-                                                duration: Duration(seconds: 1),
-                                                content:
-                                                    Text(Message.addlngandlong),
-                                              ),
-                                            );
-                                          } else {
-                                            double latitude =
-                                                double.parse(match.group(1)!);
-                                            double longitude =
-                                                double.parse(match.group(2)!);
-
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    NavigationScreen(
-                                                        latitude, longitude),
-                                              ),
-                                            );
-                                          }
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NavigationScreen(description),
+                                            ),
+                                          );
                                         }
 
                                         DateTime? completedDate;
