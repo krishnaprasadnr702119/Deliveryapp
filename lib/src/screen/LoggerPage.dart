@@ -167,30 +167,4 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
       ),
     );
   }
-
-  void _applyFilter(String? filter, {DateTime? selectedDate}) {
-    setState(() {
-      selectedFilter = filter;
-    });
-
-    if (filter == null) {
-      // print("Fetching all tasks for user: ${widget.user?.id}");
-      context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
-    } else if (filter == 'Created' && selectedDate != null) {
-      context.read<CrudBloc>().add(FetchTasksByDate(
-            selectedDate: selectedDate,
-            userId: widget.user?.id ?? '',
-          ));
-    } else if (filter == 'Completed' && selectedDate != null) {
-      context.read<CrudBloc>().add(FetchTasksByCompletedDate(
-            selectedDate: selectedDate,
-            userId: widget.user?.id ?? '',
-          ));
-    } else {
-      context.read<CrudBloc>().add(FetchTasksByStatus(
-            status: filter,
-            userId: widget.user?.id ?? '',
-          ));
-    }
-  }
 }

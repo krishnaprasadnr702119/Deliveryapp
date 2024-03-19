@@ -9,6 +9,7 @@ import 'package:task/src/screen/registration.dart';
 import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/login_fields.dart';
 import 'package:task/src/screen/task.dart';
+import 'package:task/src/widgets/rainbow.dart';
 
 class LoginPage extends StatelessWidget {
   final _usernameController = TextEditingController();
@@ -34,7 +35,7 @@ class LoginPage extends StatelessWidget {
           // Display a loading indicator while the image is loading
           return Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: RainbowLoadingIndicator(),
             ),
           );
         } else {

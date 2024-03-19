@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:task/src/screen/login.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -12,10 +12,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigatetohome();
+    _navigatetohome(context); // Pass the context here
   }
 
-  _navigatetohome() async {
+  _navigatetohome(BuildContext context) async {
+    // Receive the context here
     await Future.delayed(const Duration(milliseconds: 1000), () {});
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => LoginPage()));

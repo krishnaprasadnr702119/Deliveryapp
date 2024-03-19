@@ -212,48 +212,11 @@ class _DetailsPageState extends State<DetailsPage> {
                 children: [
                   CustomText(text: 'title'.toUpperCase()),
                   const SizedBox(height: 10),
-                  Flexible(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      initialValue: currentTodo.title,
-                      enabled: false,
-                    ),
-                  ),
+                  tittle(),
                   const SizedBox(height: 10),
                   CustomText(text: 'description'.toUpperCase()),
                   const SizedBox(height: 10),
-                  Flexible(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      initialValue: currentTodo.description,
-                      enabled: false,
-                      maxLines: 2,
-                    ),
-                  ),
+                  description(),
                   const SizedBox(height: 10),
                   CustomText(text: 'date made'.toUpperCase()),
                   const SizedBox(height: 10),
@@ -309,122 +272,26 @@ class _DetailsPageState extends State<DetailsPage> {
                                           alignment: Alignment.topLeft,
                                           child: Text('Order'),
                                         ),
-                                        Flexible(
-                                          child: TextFormField(
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.grey),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.blue),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.grey[200],
-                                            ),
-                                            maxLines: 1,
-                                            controller: _newTitle,
-                                          ),
-                                        ),
+                                        order(),
                                         const SizedBox(height: 10),
                                         Align(
                                           alignment: Alignment.topLeft,
                                           child: Text(Message.location),
                                         ),
-                                        Flexible(
-                                          child: TextFormField(
-                                            controller: _newDescription,
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.grey),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.blue),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.grey[200],
-                                            ),
-                                            maxLines: 2,
-                                          ),
-                                        ),
+                                        location(),
                                         const SizedBox(height: 10),
                                         if (isPinRequired())
                                           Align(
                                             alignment: Alignment.topLeft,
                                             child: Text(Message.pin),
                                           ),
-                                        if (isPinRequired())
-                                          Flexible(
-                                            child: TextFormField(
-                                              obscureText: true,
-                                              maxLength: 4,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                isDense: true,
-                                                border: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors.grey),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors.blue),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                                filled: true,
-                                                fillColor: Colors.grey[200],
-                                              ),
-                                              maxLines: 1,
-                                              controller: _newPin,
-                                            ),
-                                          ),
+                                        if (isPinRequired()) pin(),
                                         const SizedBox(height: 10),
                                         Align(
                                           alignment: Alignment.topLeft,
                                           child: Text(Message.date),
                                         ),
-                                        Flexible(
-                                          child: TextFormField(
-                                            controller: _newDate,
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.grey),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.blue),
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                              ),
-                                              filled: true,
-                                              fillColor: Colors.grey[200],
-                                            ),
-                                            maxLines: 1,
-                                          ),
-                                        ),
+                                        date(),
                                         const SizedBox(height: 10),
                                         Align(
                                           alignment: Alignment.topLeft,
@@ -440,7 +307,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                           items:
                                               getDropdownItems(selectedStatus),
                                           style: const TextStyle(
-                                            color: Colors.green,
+                                            color: Colors.black,
                                           ),
                                           dropdownColor: Colors.white,
                                         ),
@@ -479,105 +346,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                         child: Text(Message.addimage),
                                       ),
                                     ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        minimumSize: Size(280, 40),
-                                      ),
-                                      onPressed: () async {
-                                        if (isPinRequired() &&
-                                            (_newPin.text.isEmpty ||
-                                                _newPin.text.length != 4)) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              backgroundColor: Colors.red,
-                                              duration: Duration(seconds: 1),
-                                              content: Text(Message.addpin),
-                                            ),
-                                          );
-                                          return;
-                                        }
-                                        if (selectedStatus == 'Started') {
-                                          statusChanged = true;
-                                          String description =
-                                              _newDescription.text;
-
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  NavigationScreen(description),
-                                            ),
-                                          );
-                                        }
-
-                                        DateTime? completedDate;
-                                        if (isPinRequired()) {
-                                          completedDate = DateTime.now();
-                                        }
-                                        if (currentTodo.status !=
-                                            selectedStatus) {
-                                          // Update the status in the currentTodo object
-                                          currentTodo = currentTodo.copyWith(
-                                              status: selectedStatus);
-
-                                          context.read<CrudBloc>().add(
-                                                UpdateTodo(
-                                                  todo: Todo(
-                                                    id: currentTodo.id,
-                                                    createdTime:
-                                                        currentTodo.createdTime,
-                                                    description:
-                                                        _newDescription.text,
-                                                    isImportant: toggleSwitch,
-                                                    number: currentTodo.number,
-                                                    title: _newTitle.text,
-                                                    status: selectedStatus,
-                                                    pin: isPinRequired()
-                                                        ? int.parse(
-                                                            _newPin.text)
-                                                        : originalPin,
-                                                    date: DateFormat.yMMMEd()
-                                                        .parse(_newDate.text),
-                                                    completedDate:
-                                                        completedDate,
-                                                    imagePath: _image?.path,
-                                                    userId:
-                                                        widget.user?.id ?? '',
-                                                  ),
-                                                  userId: widget.user?.id ?? '',
-                                                ),
-                                              );
-
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              backgroundColor: Colors.green,
-                                              duration: Duration(seconds: 1),
-                                              content:
-                                                  Text(Message.taskupdated),
-                                            ),
-                                          );
-
-                                          Navigator.popUntil(context,
-                                              (route) => route.isFirst);
-
-                                          context.read<CrudBloc>().add(
-                                              FetchTodos(
-                                                  userId:
-                                                      widget.user?.id ?? ''));
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => TaskPage(
-                                                user: widget.user,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text(Message.update),
-                                    ),
+                                    updatingtask(context),
                                   ],
                                 ),
                               );
@@ -604,6 +373,227 @@ class _DetailsPageState extends State<DetailsPage> {
             return Container();
           },
         ),
+      ),
+    );
+  }
+
+  ElevatedButton updatingtask(BuildContext context) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(280, 40),
+      ),
+      onPressed: () async {
+        if (isPinRequired() &&
+            (_newPin.text.isEmpty || _newPin.text.length != 4)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 1),
+              content: Text(Message.addpin),
+            ),
+          );
+          return;
+        }
+        if (selectedStatus == 'Started') {
+          statusChanged = true;
+          String description = _newDescription.text;
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NavigationScreen(description),
+            ),
+          );
+        }
+
+        DateTime? completedDate;
+        if (isPinRequired()) {
+          completedDate = DateTime.now();
+        }
+        if (currentTodo.status != selectedStatus) {
+          // Update the status in the currentTodo object
+          currentTodo = currentTodo.copyWith(status: selectedStatus);
+
+          context.read<CrudBloc>().add(
+                UpdateTodo(
+                  todo: Todo(
+                    id: currentTodo.id,
+                    createdTime: currentTodo.createdTime,
+                    description: _newDescription.text,
+                    isImportant: toggleSwitch,
+                    number: currentTodo.number,
+                    title: _newTitle.text,
+                    status: selectedStatus,
+                    pin:
+                        isPinRequired() ? int.parse(_newPin.text) : originalPin,
+                    date: DateFormat.yMMMEd().parse(_newDate.text),
+                    completedDate: completedDate,
+                    imagePath: _image?.path,
+                    userId: widget.user?.id ?? '',
+                  ),
+                  userId: widget.user?.id ?? '',
+                ),
+              );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 1),
+              content: Text(Message.taskupdated),
+            ),
+          );
+
+          Navigator.popUntil(context, (route) => route.isFirst);
+
+          context
+              .read<CrudBloc>()
+              .add(FetchTodos(userId: widget.user?.id ?? ''));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TaskPage(
+                user: widget.user,
+              ),
+            ),
+          );
+        }
+      },
+      child: Text(Message.update),
+    );
+  }
+
+  Flexible date() {
+    return Flexible(
+      child: TextFormField(
+        controller: _newDate,
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        maxLines: 1,
+      ),
+    );
+  }
+
+  Flexible pin() {
+    return Flexible(
+      child: TextFormField(
+        obscureText: true,
+        maxLength: 4,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        maxLines: 1,
+        controller: _newPin,
+      ),
+    );
+  }
+
+  Flexible location() {
+    return Flexible(
+      child: TextFormField(
+        controller: _newDescription,
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        maxLines: 2,
+      ),
+    );
+  }
+
+  Flexible order() {
+    return Flexible(
+      child: TextFormField(
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        maxLines: 1,
+        controller: _newTitle,
+      ),
+    );
+  }
+
+  Flexible description() {
+    return Flexible(
+      child: TextFormField(
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        initialValue: currentTodo.description,
+        enabled: false,
+        maxLines: 2,
+      ),
+    );
+  }
+
+  Flexible tittle() {
+    return Flexible(
+      child: TextFormField(
+        decoration: InputDecoration(
+          isDense: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        initialValue: currentTodo.title,
+        enabled: false,
       ),
     );
   }
