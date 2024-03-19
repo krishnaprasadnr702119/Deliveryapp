@@ -8,7 +8,6 @@ import 'package:task/src/blocs/Task/crud_bloc.dart';
 import 'package:task/src/models/todo.dart';
 import 'package:task/src/screen/add_todo.dart';
 import 'package:task/src/screen/details_page.dart';
-import 'package:task/src/utils/message.dart';
 import 'package:task/src/widgets/statuscolor.dart';
 import 'package:task/src/screen/LoggerPage.dart';
 
@@ -26,7 +25,6 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   late bool isLoading;
   int initialTaskCount = 10;
   int totalTaskCount = 0;
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -35,31 +33,12 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
     isLoading = false;
     _checkUserIdInSharedPreferences();
     AppDatabase().initDatabase();
-    _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
-    _scrollController.removeListener(_scrollListener);
     super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      _loadMoreItems();
-    }
-  }
-
-  void _loadMoreItems() {
-    setState(() {
-      initialTaskCount += 10;
-      if (initialTaskCount > totalTaskCount) {
-        initialTaskCount = totalTaskCount;
-      }
-    });
   }
 
   @override
@@ -102,11 +81,22 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_list, color: Colors.white),
             onSelected: (String value) {
-              _applyFilter(null);
+              _applyFilter(value);
             },
             itemBuilder: (BuildContext context) {
               return [
+                PopupMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    'Filter',
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20),
+                  ),
+                ),
                 const PopupMenuItem<String>(
                   value: 'Completed',
                   child: Text('Completed Tasks'),
@@ -159,7 +149,9 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               currentAccountPictureSize: Size.square(72),
             ),
             ListTile(
-              title: Text('Logger', style: TextStyle(color: Colors.black)),
+              title: Text('Logger',
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -171,7 +163,9 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               },
             ),
             ListTile(
-              title: Text('Logout', style: TextStyle(color: Colors.black)),
+              title: Text('Logout',
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -180,27 +174,6 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
               },
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: ((context) => AddTodoPage(user: widget.user)),
-            ),
-          );
-
-          if (result == true) {
-            _checkUserIdInSharedPreferences();
-          }
-        },
-        child: Center(
-          child: Text(
-            'Add Task',
-            style: TextStyle(
-                fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
-          ),
         ),
       ),
       body: BlocBuilder<CrudBloc, CrudState>(
@@ -218,107 +191,126 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                   fit: BoxFit.cover,
                 ),
               ),
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (scrollNotification) {
-                  if (scrollNotification is ScrollEndNotification &&
-                      _scrollController.position.extentAfter == 0) {
-                    // Reach the end of the list, load more items
-                    _loadMoreItems();
-                  }
-                  return false;
-                },
-                child: Column(
-                  children: [
-                    SingleChildScrollView(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              _applyFilter(null);
-                            },
-                            child: const Text('All Tasks'),
-                          ),
-                        ],
-                      ),
+              child: Column(
+                children: [
+                  SingleChildScrollView(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      // children: [
+                      //   ElevatedButton(
+                      //     onPressed: () {
+                      //       _applyFilter(null);
+                      //     },
+                      //     child: const Text('All Tasks'),
+                      //   ),
+                      // ],
                     ),
-                    if (state is DisplayTodos && state.todo.isNotEmpty)
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: initialTaskCount <= state.todo.length
-                              ? initialTaskCount
-                              : state.todo.length,
-                          itemBuilder: (context, i) {
-                            Todo currentTodo = state.todo[i];
-                            return GestureDetector(
-                              onTap: () async {
-                                context.read<CrudBloc>().add(FetchSpecificTodo(
-                                      id: currentTodo.id!,
-                                      userId: widget.user?.id ?? '',
-                                    ));
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: ((context) =>
-                                        DetailsPage(user: widget.user)),
-                                  ),
-                                );
+                  ),
+                  if (state is DisplayTodos && state.todo.isNotEmpty)
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: initialTaskCount <= state.todo.length
+                            ? initialTaskCount
+                            : state.todo.length,
+                        itemBuilder: (context, i) {
+                          Todo currentTodo = state.todo[i];
+                          return GestureDetector(
+                            onTap: () async {
+                              context.read<CrudBloc>().add(FetchSpecificTodo(
+                                    id: currentTodo.id!,
+                                    userId: widget.user?.id ?? '',
+                                  ));
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) =>
+                                      DetailsPage(user: widget.user)),
+                                ),
+                              );
 
-                                if (result == true) {
-                                  _checkUserIdInSharedPreferences();
-                                }
-                              },
-                              child: Container(
-                                height: 80,
-                                margin: const EdgeInsets.only(bottom: 14),
-                                child: Card(
-                                  elevation: 10,
-                                  color:
-                                      StatusColor.getColor(currentTodo.status),
-                                  child: ListTile(
-                                    title: Text(
-                                      currentTodo.title.toUpperCase(),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              if (result == true) {
+                                _checkUserIdInSharedPreferences();
+                              }
+                            },
+                            child: Container(
+                              height: 80,
+                              margin: const EdgeInsets.only(bottom: 14),
+                              child: Card(
+                                elevation: 10,
+                                color: StatusColor.getColor(currentTodo.status),
+                                child: ListTile(
+                                  title: Text(
+                                    currentTodo.title.toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    subtitle: Text(
-                                      'Status: ${currentTodo.status}',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                      ),
+                                  ),
+                                  subtitle: Text(
+                                    'Status: ${currentTodo.status}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
                                     ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            _deleteTask(currentTodo.id!);
-                                          },
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          _deleteTask(currentTodo.id!);
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      const Text('No tasks'),
-                  ],
-                ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    const Text('No tasks'),
+                  if (initialTaskCount < totalTaskCount)
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          initialTaskCount += 10;
+                          if (initialTaskCount > totalTaskCount) {
+                            initialTaskCount = totalTaskCount;
+                          }
+                        });
+                      },
+                      child: Text('Load More'),
+                    ),
+                ],
               ),
             ),
           );
         },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => AddTodoPage(user: widget.user)),
+            );
+          },
+          child: Text(
+            'Add Task',
+            style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 20),
+          ),
+        ),
       ),
     );
   }
@@ -362,41 +354,14 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
     }
   }
 
-  void _deleteTask(int id) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(Message.deleteconf),
-          content: Text(Message.confdelete),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(Message.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _performDeleteTask(id);
-              },
-              child: Text(Message.deleted),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _performDeleteTask(int id) {
+  void _deleteTask(int Id) {
     context
         .read<CrudBloc>()
-        .add(DeleteTodo(id: id, userId: widget.user?.id ?? ''));
+        .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         duration: Duration(seconds: 1),
-        content: Text(Message.deleted),
+        content: Text("Deleted Task"),
         backgroundColor: Colors.green,
       ),
     );

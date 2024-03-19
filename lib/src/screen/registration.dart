@@ -28,7 +28,7 @@ class RegistrationForm extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -149,7 +149,8 @@ class RegistrationForm extends StatelessWidget {
                             ),
                             child: Text(
                               Message.Register,
-                              style: TextStyle(fontSize: 16),
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
                             ),
                           ),
                         ),

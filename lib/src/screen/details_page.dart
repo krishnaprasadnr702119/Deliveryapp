@@ -48,7 +48,52 @@ class _DetailsPageState extends State<DetailsPage> {
   }
 
   Future<void> _pickImageAndSaveToDB() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    // Show a dialog to choose between gallery and camera
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Image Source"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: Row(
+                    children: [
+                      Icon(Icons.photo_library),
+                      SizedBox(width: 8),
+                      Text("Gallery"),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _getImageFromSource(ImageSource.gallery);
+                  },
+                ),
+                Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: Row(
+                    children: [
+                      Icon(Icons.camera_alt),
+                      SizedBox(width: 8),
+                      Text("Camera"),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _getImageFromSource(ImageSource.camera);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getImageFromSource(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
@@ -400,15 +445,6 @@ class _DetailsPageState extends State<DetailsPage> {
                                           dropdownColor: Colors.white,
                                         ),
                                         const SizedBox(height: 10),
-                                        Visibility(
-                                          visible: isImageSelected,
-                                          child: Text(
-                                            'Image Name: ${_image?.path.split('/').last}',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   ),

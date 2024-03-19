@@ -1,5 +1,3 @@
-// forget_password_form.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task/src/blocs/Forget_Password/forgetpassword_bloc.dart';
@@ -20,7 +18,10 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
