@@ -6,6 +6,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final bool showVisibilityToggle;
+  final IconData? icon;
 
   const CustomTextField({
     Key? key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.showVisibilityToggle = false,
+    this.icon,
   }) : super(key: key);
 
   @override
@@ -35,6 +37,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide(color: Colors.white),
         ),
+        prefixIcon:
+            widget.icon != null ? Icon(widget.icon, color: Colors.white) : null,
         suffixIcon: widget.showVisibilityToggle
             ? GestureDetector(
                 onTap: () {
@@ -50,7 +54,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : null,
       ),
       keyboardType: widget.keyboardType,
-      obscureText: _obscureText,
+      obscureText: widget.obscureText ? _obscureText : false,
     );
   }
 }

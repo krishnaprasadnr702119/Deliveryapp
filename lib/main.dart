@@ -9,7 +9,6 @@ import 'package:task/src/screen/login.dart';
 import 'package:task/src/screen/splashscreen.dart';
 import 'package:task/src/blocs/SignUp/registration_bloc.dart';
 import 'package:task/src/blocs/Task/crud_bloc.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {

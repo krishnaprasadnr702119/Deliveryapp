@@ -11,36 +11,36 @@ class LoginFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: usernameController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Username',
-            labelStyle: TextStyle(color: Colors.white),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide(color: Colors.white),
-            ),
+    return Column(children: [
+      TextField(
+        controller: usernameController,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: 'Username',
+          labelStyle: TextStyle(color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(color: Colors.white),
           ),
+          prefixIcon: Icon(Icons.person, color: Colors.white),
         ),
-        SizedBox(height: 16),
-        TextField(
-          controller: passwordController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Password',
-            labelStyle: TextStyle(color: Colors.white),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: BorderSide(color: Colors.white),
-            ),
+      ),
+      SizedBox(height: 16),
+      TextField(
+        controller: passwordController,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: 'Password',
+          labelStyle: TextStyle(color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(color: Colors.white),
           ),
-          obscureText: true,
+          prefixIcon: Icon(Icons.lock, color: Colors.white),
         ),
-        SizedBox(height: 16),
-      ],
-    );
+        obscureText: true,
+      ),
+      SizedBox(height: 16),
+    ]);
   }
 }

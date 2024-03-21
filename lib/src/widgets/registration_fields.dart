@@ -22,12 +22,14 @@ class RegistrationFields extends StatelessWidget {
         CustomTextField(
           controller: usernameController,
           label: 'Username',
+          icon: Icons.person,
         ),
         SizedBox(height: 16),
         CustomTextField(
           controller: emailController,
           label: 'Email',
           keyboardType: TextInputType.emailAddress,
+          icon: Icons.email,
         ),
         SizedBox(height: 16),
         CustomTextField(
@@ -35,6 +37,7 @@ class RegistrationFields extends StatelessWidget {
           label: 'Password',
           obscureText: true,
           showVisibilityToggle: true,
+          icon: Icons.lock,
         ),
         SizedBox(height: 16),
         CustomTextField(
@@ -42,8 +45,8 @@ class RegistrationFields extends StatelessWidget {
           label: 'Confirm Password',
           obscureText: true,
           showVisibilityToggle: true,
+          icon: Icons.lock,
         ),
-        SizedBox(height: 16),
       ],
     );
   }

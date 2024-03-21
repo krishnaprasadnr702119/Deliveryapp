@@ -95,86 +95,88 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   ElevatedButton submit(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        if (_title.text.isNotEmpty &&
-            _locationController.text.isNotEmpty &&
-            _pinController.text.isNotEmpty &&
-            _dateController.text.isNotEmpty) {
-          try {
-            // Parse the pin as an integer
-            int pin = _pinController.text.isNotEmpty
-                ? int.tryParse(_pinController.text) ?? 0
-                : 0;
+        onPressed: () {
+          if (_title.text.isNotEmpty &&
+              _locationController.text.isNotEmpty &&
+              _pinController.text.isNotEmpty &&
+              _dateController.text.isNotEmpty) {
+            try {
+              // Parse the pin as an integer
+              int pin = _pinController.text.isNotEmpty
+                  ? int.tryParse(_pinController.text) ?? 0
+                  : 0;
 
-            // Parse and validate the date
-            if (_dateController.text.isNotEmpty) {
-              DateTime? parsedDate;
+              // Parse and validate the date
+              if (_dateController.text.isNotEmpty) {
+                DateTime? parsedDate;
 
-              try {
-                parsedDate = DateTime.parse(_dateController.text);
-              } catch (e) {
-                print("Error parsing date: $e");
-              }
+                try {
+                  parsedDate = DateTime.parse(_dateController.text);
+                } catch (e) {
+                  print("Error parsing date: $e");
+                }
 
-              if (parsedDate != null && parsedDate.isAfter(DateTime.now())) {
-                context.read<CrudBloc>().add(
-                      AddTodo(
-                        title: _title.text,
-                        isImportant: false,
-                        number: 0,
-                        description: _locationController.text,
-                        createdTime: DateTime.now(),
-                        status: selectedStatus,
-                        pin: pin,
-                        date: parsedDate,
-                        userId: widget.user!.id,
-                      ),
-                    );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    duration: Duration(seconds: 1),
-                    content: Text(Message.tasksuccess),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                context.read<CrudBloc>().add(
-                      FetchTodos(userId: widget.user?.id ?? ''),
-                    );
-                Navigator.pop(context);
+                if (parsedDate != null && parsedDate.isAfter(DateTime.now())) {
+                  context.read<CrudBloc>().add(
+                        AddTodo(
+                          title: _title.text,
+                          isImportant: false,
+                          number: 0,
+                          description: _locationController.text,
+                          createdTime: DateTime.now(),
+                          status: selectedStatus,
+                          pin: pin,
+                          date: parsedDate,
+                          userId: widget.user!.id,
+                        ),
+                      );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: Duration(seconds: 1),
+                      content: Text(Message.tasksuccess),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  context.read<CrudBloc>().add(
+                        FetchTodos(userId: widget.user?.id ?? ''),
+                      );
+                  Navigator.pop(context);
+                } else {
+                  print("Invalid date: $parsedDate");
+                }
               } else {
-                print("Invalid date: $parsedDate");
+                print("Date field is empty");
               }
-            } else {
-              print("Date field is empty");
+            } catch (e) {
+              print("Error parsing date: $e");
             }
-          } catch (e) {
-            print("Error parsing date: $e");
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(Message.allfill),
+                backgroundColor: Colors.green,
+              ),
+            );
           }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(Message.allfill),
-              backgroundColor: Colors.green,
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.white),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-          );
-        }
-      },
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.blue),
-        shape: MaterialStateProperty.all(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: MaterialStateProperty.all(
+            EdgeInsets.all(20),
+          ),
+          minimumSize: MaterialStateProperty.all(
+            Size(400, 60),
           ),
         ),
-        padding: MaterialStateProperty.all(
-          EdgeInsets.all(20),
-        ),
-        minimumSize: MaterialStateProperty.all(
-          Size(400, 60),
-        ),
-      ),
-      child: Text(Message.submit),
-    );
+        child: Text(
+          Message.submit,
+          style: TextStyle(color: Colors.black, fontSize: 16),
+        ));
   }
 
   TextFormField datepicker(BuildContext context) {
@@ -248,6 +250,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
+        hintText: 'Enter order name',
+        hintStyle: TextStyle(color: Colors.white),
       ),
     );
   }

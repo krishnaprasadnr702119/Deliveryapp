@@ -29,6 +29,7 @@ class _ForgetPasswordFieldsState extends State<ForgetPasswordFields> {
           controller: _usernameController,
           labelText: 'Username',
           onChanged: (_) => _validateUsernameAndEmail(),
+          icon: Icons.person,
         ),
         SizedBox(height: 16),
         CustomTextField(
@@ -36,6 +37,7 @@ class _ForgetPasswordFieldsState extends State<ForgetPasswordFields> {
           labelText: 'Email',
           onChanged: (_) => _validateUsernameAndEmail(),
           keyboardType: TextInputType.emailAddress,
+          icon: Icons.email,
         ),
         SizedBox(height: 16),
         if (_isUsernameAndEmailValid) ...[
@@ -43,12 +45,14 @@ class _ForgetPasswordFieldsState extends State<ForgetPasswordFields> {
             controller: _passwordController,
             labelText: 'New Password',
             obscureText: true,
+            icon: Icons.lock,
           ),
           SizedBox(height: 16),
           CustomTextField(
             controller: _confirmPasswordController,
             labelText: 'Confirm Password',
             obscureText: true,
+            icon: Icons.lock,
           ),
           SizedBox(height: 16),
         ],

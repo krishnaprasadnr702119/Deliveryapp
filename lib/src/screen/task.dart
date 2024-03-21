@@ -80,102 +80,10 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-            onSelected: (String value) {
-              _applyFilter(value);
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<String>(
-                  value: null,
-                  child: Text(
-                    'Filter',
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Completed',
-                  child: Text('Completed Tasks'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Pending',
-                  child: Text('Pending Tasks'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'Started',
-                  child: Text('Started Tasks'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'Created',
-                  child: Text('Filter by Created Date'),
-                  onTap: () async {
-                    await _selectDate(context, filter: 'Created');
-                  },
-                ),
-                PopupMenuItem<String>(
-                  value: 'Completed',
-                  child: Text('Filter by Completed Date'),
-                  onTap: () async {
-                    await _selectDate(context, filter: 'Completed');
-                  },
-                ),
-              ];
-            },
-          ),
+          filter(),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: widget.user != null
-                  ? Text(widget.user!.username,
-                      style: TextStyle(color: Colors.white))
-                  : null,
-              accountEmail: widget.user != null
-                  ? Text(widget.user!.email,
-                      style: TextStyle(color: Colors.white))
-                  : null,
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(widget.user?.username.substring(0, 1) ?? ''),
-              ),
-              margin: EdgeInsets.zero,
-              currentAccountPictureSize: Size.square(72),
-            ),
-            ListTile(
-              title: Text('Logger',
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (c) => LoggerPage(
-                            user: widget.user,
-                          )),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('Logout',
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (c) => LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: drawer(context),
       body: BlocBuilder<CrudBloc, CrudState>(
         builder: (context, state) {
           if (state is DisplayTodos) {
@@ -191,104 +99,7 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
                   fit: BoxFit.cover,
                 ),
               ),
-              child: Column(
-                children: [
-                  SingleChildScrollView(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      // children: [
-                      //   ElevatedButton(
-                      //     onPressed: () {
-                      //       _applyFilter(null);
-                      //     },
-                      //     child: const Text('All Tasks'),
-                      //   ),
-                      // ],
-                    ),
-                  ),
-                  if (state is DisplayTodos && state.todo.isNotEmpty)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: initialTaskCount <= state.todo.length
-                            ? initialTaskCount
-                            : state.todo.length,
-                        itemBuilder: (context, i) {
-                          Todo currentTodo = state.todo[i];
-                          return GestureDetector(
-                            onTap: () async {
-                              context.read<CrudBloc>().add(FetchSpecificTodo(
-                                    id: currentTodo.id!,
-                                    userId: widget.user?.id ?? '',
-                                  ));
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: ((context) =>
-                                      DetailsPage(user: widget.user)),
-                                ),
-                              );
-
-                              if (result == true) {
-                                _checkUserIdInSharedPreferences();
-                              }
-                            },
-                            child: Container(
-                              height: 80,
-                              margin: const EdgeInsets.only(bottom: 14),
-                              child: Card(
-                                elevation: 10,
-                                color: StatusColor.getColor(currentTodo.status),
-                                child: ListTile(
-                                  title: Text(
-                                    currentTodo.title.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    'Status: ${currentTodo.status}',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          _deleteTask(currentTodo.id!);
-                                        },
-                                        icon: const Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  else
-                    const Text('No tasks'),
-                  if (initialTaskCount < totalTaskCount)
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          initialTaskCount += 10;
-                          if (initialTaskCount > totalTaskCount) {
-                            initialTaskCount = totalTaskCount;
-                          }
-                        });
-                      },
-                      child: Text('Load More'),
-                    ),
-                ],
-              ),
+              child: listview(state),
             ),
           );
         },
@@ -312,6 +123,204 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
           ),
         ),
       ),
+    );
+  }
+
+  Column listview(CrudState state) {
+    return Column(
+      children: [
+        SingleChildScrollView(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            // children: [
+            //   ElevatedButton(
+            //     onPressed: () {
+            //       _applyFilter(null);
+            //     },
+            //     child: const Text('All Tasks'),
+            //   ),
+            // ],
+          ),
+        ),
+        if (state is DisplayTodos && state.todo.isNotEmpty)
+          Expanded(
+            child: ListView.builder(
+              itemCount: initialTaskCount <= state.todo.length
+                  ? initialTaskCount
+                  : state.todo.length,
+              itemBuilder: (context, i) {
+                Todo currentTodo = state.todo[i];
+                return GestureDetector(
+                  onTap: () async {
+                    context.read<CrudBloc>().add(FetchSpecificTodo(
+                          id: currentTodo.id!,
+                          userId: widget.user?.id ?? '',
+                        ));
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) => DetailsPage(user: widget.user)),
+                      ),
+                    );
+
+                    if (result == true) {
+                      _checkUserIdInSharedPreferences();
+                    }
+                  },
+                  child: Container(
+                    height: 80,
+                    margin: const EdgeInsets.only(bottom: 14),
+                    child: Card(
+                      elevation: 10,
+                      color: StatusColor.getColor(currentTodo.status),
+                      child: ListTile(
+                        title: Text(
+                          currentTodo.title.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Status: ${currentTodo.status}',
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                _deleteTask(currentTodo.id!);
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        else
+          const Text('No tasks'),
+        if (initialTaskCount < totalTaskCount)
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                initialTaskCount += 10;
+                if (initialTaskCount > totalTaskCount) {
+                  initialTaskCount = totalTaskCount;
+                }
+              });
+            },
+            child: Text('Load More'),
+          ),
+      ],
+    );
+  }
+
+  Drawer drawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: widget.user != null
+                ? Text(widget.user!.username,
+                    style: TextStyle(color: Colors.white))
+                : null,
+            accountEmail: widget.user != null
+                ? Text(widget.user!.email,
+                    style: TextStyle(color: Colors.white))
+                : null,
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(widget.user?.username.substring(0, 1) ?? ''),
+            ),
+            margin: EdgeInsets.zero,
+            currentAccountPictureSize: Size.square(72),
+          ),
+          ListTile(
+            title: Text('Logger',
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (c) => LoggerPage(
+                          user: widget.user,
+                        )),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Logout',
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (c) => LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuButton<String> filter() {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.filter_list, color: Colors.white),
+      onSelected: (String value) {
+        _applyFilter(value);
+      },
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<String>(
+            value: null,
+            child: Text(
+              'Filter',
+              style: TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: 'Completed',
+            child: Text('Completed Tasks'),
+          ),
+          const PopupMenuItem<String>(
+            value: 'Pending',
+            child: Text('Pending Tasks'),
+          ),
+          const PopupMenuItem<String>(
+            value: 'Started',
+            child: Text('Started Tasks'),
+          ),
+          PopupMenuItem<String>(
+            value: 'Created',
+            child: Text('Filter by Created Date'),
+            onTap: () async {
+              await _selectDate(context, filter: 'Created');
+            },
+          ),
+          PopupMenuItem<String>(
+            value: 'Completed',
+            child: Text('Filter by Completed Date'),
+            onTap: () async {
+              await _selectDate(context, filter: 'Completed');
+            },
+          ),
+        ];
+      },
     );
   }
 
