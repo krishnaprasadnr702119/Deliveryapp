@@ -38,90 +38,105 @@ class RegistrationForm extends StatelessWidget {
       ),
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/background.jpg'),
-              fit: BoxFit.cover,
+      body: BlocListener<RegistrationBloc, RegistrationState>(
+        listener: (context, state) {
+          if (state is RegistrationSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('User added successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            _clearFields();
+          }
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background.jpg'),
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset('assets/logo.png', height: 390, width: 280),
-                SizedBox(height: 8),
-                RegistrationFields(
-                  usernameController: _usernameController,
-                  emailController: _emailController,
-                  passwordController: _passwordController,
-                  confirmPasswordController: _confirmPasswordController,
-                ),
-                SizedBox(height: size.height * 0.02),
-                Center(
-                  child: Container(
-                    width: double.infinity,
-                    height: size.height * 0.07,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final username = _usernameController.text;
-                        final email = _emailController.text;
-                        final password = _passwordController.text;
-                        final confirmPassword = _confirmPasswordController.text;
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset('assets/logo.png', height: 390, width: 280),
+                  SizedBox(height: 8),
+                  RegistrationFields(
+                    usernameController: _usernameController,
+                    emailController: _emailController,
+                    passwordController: _passwordController,
+                    confirmPasswordController: _confirmPasswordController,
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                  Center(
+                    child: Container(
+                      width: double.infinity,
+                      height: size.height * 0.07,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final username = _usernameController.text;
+                          final email = _emailController.text;
+                          final password = _passwordController.text;
+                          final confirmPassword =
+                              _confirmPasswordController.text;
 
-                        final validationMessage =
-                            Message.validateRegistrationFields(
-                          username,
-                          email,
-                          password,
-                          confirmPassword,
-                        );
+                          final validationMessage =
+                              Message.validateRegistrationFields(
+                            username,
+                            email,
+                            password,
+                            confirmPassword,
+                          );
 
-                        if (validationMessage == null) {
-                          final existingUser =
-                              await AppDatabase().getUserByEmail(email);
+                          if (validationMessage == null) {
+                            final existingUser =
+                                await AppDatabase().getUserByEmail(email);
 
-                          if (existingUser == null) {
-                            User user = User(
-                              id: User.generateUserId(),
-                              email: email,
-                              username: username,
-                              password: password,
-                            );
-                            registrationBloc.add(RegistrationSubmitted(user));
+                            if (existingUser == null) {
+                              User user = User(
+                                id: User.generateUserId(),
+                                email: email,
+                                username: username,
+                                password: password,
+                              );
+                              registrationBloc.add(RegistrationSubmitted(user));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(Message.UserExist),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(Message.UserExist),
+                                content: Text(validationMessage),
                                 backgroundColor: Colors.red,
                               ),
                             );
                           }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(validationMessage),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
 
-                        _clearFields();
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
-                      ),
-                      child: Text(
-                        Message.Register,
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                          _clearFields();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.blue),
+                        ),
+                        child: Text(
+                          Message.Register,
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

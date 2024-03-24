@@ -5,6 +5,7 @@ class Message {
   static var fill = "Please fill in all fields.";
   static var UserExist = "Email already exists. Please choose a different one.";
   static var Register = "Register";
+  static var Registersuccess = "Register is successful";
   static var Login = "Login";
   static var Forget = " Forget Password";
   static var account = "Create an account";

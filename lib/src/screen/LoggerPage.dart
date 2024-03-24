@@ -217,7 +217,6 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
                                         'Completed Date: ${todo.completedDate}'),
                                   Text('Status: ${todo.status}'),
                                   SizedBox(height: 8),
-                                  // Add more details if needed
                                 ],
                               ),
                             ),
