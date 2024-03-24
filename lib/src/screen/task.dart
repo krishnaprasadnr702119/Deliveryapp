@@ -349,37 +349,74 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
       selectedFilter = filter;
     });
 
-    if (filter == null) {
-      print("Fetching all tasks for user: ${widget.user?.id}");
-      context.read<CrudBloc>().add(FetchTodos(userId: widget.user?.id ?? ''));
-    } else if (filter == 'Created' && selectedDate != null) {
-      context.read<CrudBloc>().add(FetchTasksByDate(
+    final crudBloc = context.read<CrudBloc>();
+    final userId = widget.user?.id ?? '';
+
+    switch (filter) {
+      case null:
+        print("Fetching all tasks for user: $userId");
+        crudBloc.add(FetchTodos(userId: userId));
+        break;
+      case 'Created':
+        if (selectedDate != null) {
+          crudBloc.add(FetchTasksByDate(
             selectedDate: selectedDate,
-            userId: widget.user?.id ?? '',
+            userId: userId,
           ));
-    } else if (filter == 'Completed' && selectedDate != null) {
-      context.read<CrudBloc>().add(FetchTasksByCompletedDate(
+        }
+        break;
+      case 'Completed':
+        if (selectedDate != null) {
+          crudBloc.add(FetchTasksByCompletedDate(
             selectedDate: selectedDate,
-            userId: widget.user?.id ?? '',
+            userId: userId,
           ));
-    } else {
-      context.read<CrudBloc>().add(FetchTasksByStatus(
-            status: filter,
-            userId: widget.user?.id ?? '',
-          ));
+        }
+        break;
+      default:
+        crudBloc.add(FetchTasksByStatus(
+          status: filter,
+          userId: userId,
+        ));
+        break;
     }
   }
 
   void _deleteTask(int id) {
-    context
-        .read<CrudBloc>()
-        .add(DeleteTodo(id: id, userId: widget.user?.id ?? ''));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text("Deleted Task"),
-        backgroundColor: Colors.green,
-      ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Delete the task
+                context.read<CrudBloc>().add(DeleteTodo(
+                      id: id,
+                      userId: widget.user?.id ?? '',
+                    ));
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text("Deleted Task"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

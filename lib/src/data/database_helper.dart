@@ -241,20 +241,39 @@ class AppDatabase {
 
   Future<List<Todo>> readTodosByCompletedDate(DateTime selectedDate,
       {required String userId}) async {
-    DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final DateTime startDate =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final DateTime endDate = startDate.add(Duration(days: 1));
 
     final List<Map<String, Object?>>? maps = await _database?.query(
       todoTable,
       where:
           '${TodoFields.completedDate} >= ? AND ${TodoFields.completedDate} < ? AND ${TodoFields.userId} = ?',
-      whereArgs: [userId],
-      orderBy:
-          '${TodoFields.completedDate} ASC, ${TodoFields.completedDate} ASC',
+      whereArgs: [
+        startDate.millisecondsSinceEpoch,
+        endDate.millisecondsSinceEpoch,
+        userId
+      ],
+      orderBy: '${TodoFields.completedDate} ASC',
     );
 
-    return List.generate(maps!.length, (i) {
-      return Todo.fromMap(maps[i]);
-    });
+    if (maps != null) {
+      return List.generate(maps.length, (i) {
+        return Todo(
+          id: maps[i][TodoFields.id] as int,
+          isImportant: maps[i][TodoFields.isImportant] == 1,
+          number: maps[i][TodoFields.number] as int,
+          title: maps[i][TodoFields.title] as String,
+          description: maps[i][TodoFields.description] as String,
+          createdTime: DateTime.parse(maps[i][TodoFields.time] as String),
+          status: maps[i][TodoFields.status] as String,
+          pin: maps[i][TodoFields.pin] as int,
+          date: DateTime.parse(maps[i][TodoFields.date] as String),
+        );
+      });
+    } else {
+      return [];
+    }
   }
 
   Future<void> saveImagePathToDb(int todoId, String imagePath) async {
