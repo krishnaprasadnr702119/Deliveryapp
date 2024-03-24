@@ -324,8 +324,7 @@ class _DetailsPageState extends State<DetailsPage> {
                                         Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) =>
-                                                    DetailsPage(
+                                                builder: (context) => TaskPage(
                                                       user: widget.user,
                                                     )));
                                       },
