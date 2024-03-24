@@ -25,10 +25,13 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   late bool isLoading;
   int initialTaskCount = 10;
   int totalTaskCount = 0;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance?.addObserver(this);
     isLoading = false;
     _checkUserIdInSharedPreferences();
@@ -38,7 +41,25 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
+    _scrollController.dispose(); // Dispose the scroll controller
     super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      // Reach the end of the list
+      _loadMoreItems();
+    }
+  }
+
+  void _loadMoreItems() {
+    setState(() {
+      initialTaskCount += 10;
+      if (initialTaskCount > totalTaskCount) {
+        initialTaskCount = totalTaskCount;
+      }
+    });
   }
 
   @override
@@ -132,19 +153,12 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
         SingleChildScrollView(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            // children: [
-            //   ElevatedButton(
-            //     onPressed: () {
-            //       _applyFilter(null);
-            //     },
-            //     child: const Text('All Tasks'),
-            //   ),
-            // ],
           ),
         ),
         if (state is DisplayTodos && state.todo.isNotEmpty)
           Expanded(
             child: ListView.builder(
+              controller: _scrollController, // Assign the scroll controller
               itemCount: initialTaskCount <= state.todo.length
                   ? initialTaskCount
                   : state.todo.length,
@@ -211,17 +225,7 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
         else
           const Text('No tasks'),
         if (initialTaskCount < totalTaskCount)
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                initialTaskCount += 10;
-                if (initialTaskCount > totalTaskCount) {
-                  initialTaskCount = totalTaskCount;
-                }
-              });
-            },
-            child: Text('Load More'),
-          ),
+          CircularProgressIndicator(), // Placeholder for loading indicator
       ],
     );
   }
@@ -290,7 +294,10 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
             child: Text(
               'Filter',
               style: TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
           ),
           const PopupMenuItem<String>(
@@ -363,10 +370,10 @@ class _TaskPageState extends State<TaskPage> with WidgetsBindingObserver {
     }
   }
 
-  void _deleteTask(int Id) {
+  void _deleteTask(int id) {
     context
         .read<CrudBloc>()
-        .add(DeleteTodo(id: Id, userId: widget.user?.id ?? ''));
+        .add(DeleteTodo(id: id, userId: widget.user?.id ?? ''));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         duration: Duration(seconds: 1),

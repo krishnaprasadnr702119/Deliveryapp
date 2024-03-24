@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task/src/data/database_helper.dart';
 import 'package:task/src/models/user.dart';
@@ -20,14 +23,24 @@ class LoggerPage extends StatefulWidget {
 class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
   String? selectedFilter;
   late bool isLoading;
+  late List<Todo> logs;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
     isLoading = false;
+    logs = [];
     _checkUserIdInSharedPreferences();
     AppDatabase().initDatabase();
+
+    // Listen to CRUD events
+    context.read<CrudBloc>().stream.listen((state) {
+      if (state is DisplayTodos && state.todo.isNotEmpty) {
+        // Update log file after a task is deleted
+        _updateLogAfterDeletion(state.todo.first);
+      }
+    });
   }
 
   @override
@@ -64,6 +77,90 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _saveLogsToFile(List<Todo> todos) async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/log.txt');
+    String content = '';
+
+    for (Todo todo in todos) {
+      content += 'Title: ${todo.title}\n';
+      content += 'User ID: ${todo.userId}\n';
+      content += 'Status: ${todo.status}\n';
+      content += 'Order Number: ${todo.id}\n';
+      content += 'Created Time: ${todo.createdTime}\n';
+      if (todo.completedDate != null) {
+        content += 'Expected Completion Date: ${todo.completedDate}\n';
+      }
+      content += '\n';
+    }
+
+    await file.writeAsString(content);
+  }
+
+  Future<List<Todo>> _readLogsFromFile() async {
+    try {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final File file = File('${directory.path}/log.txt');
+      if (!file.existsSync()) {
+        return []; // Return an empty list if the file doesn't exist
+      }
+      String fileContent = await file.readAsString();
+
+      List<Todo> todos = [];
+      List<String> logLines = fileContent.split('\n\n');
+      for (String logLine in logLines) {
+        List<String> logFields = logLine.split('\n');
+        if (logFields.length >= 5) {
+          // Check if logFields has at least 5 elements
+          Todo todo = Todo(
+              title: logFields[0].split(': ')[1],
+              userId: logFields[1].split(': ')[1],
+              status: logFields[2].split(': ')[1],
+              id: int.parse(logFields[3].split(': ')[1]),
+              createdTime: DateTime.parse(logFields[4].split(': ')[1]),
+              completedDate: logFields.length >= 6
+                  ? DateTime.parse(logFields[5].split(': ')[1])
+                  : null,
+              imagePath: logLine.contains('Image Path')
+                  ? logFields[6].split(': ')[1]
+                  : null,
+              isImportant: false,
+              number: 0,
+              description: '',
+              pin: 0,
+              date: DateTime.now());
+          todos.add(todo);
+        }
+      }
+
+      return todos;
+    } catch (e) {
+      print('Error reading logs from file: $e');
+      return [];
+    }
+  }
+
+  Future<void> _updateLogAfterDeletion(Todo deletedTodo) async {
+    try {
+      // Read existing log file content
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final File file = File('${directory.path}/log.txt');
+      String fileContent = await file.readAsString();
+
+      // Append deleted task details to the log file
+      String deletionLog = 'Title: ${deletedTodo.title}\n'
+          'User ID: ${deletedTodo.userId}\n'
+          'Status: ${deletedTodo.status}\n'
+          'Order Number: ${deletedTodo.id}\n'
+          'Created Time: ${deletedTodo.createdTime}\n'
+          'Deleted Time: ${DateTime.now()}\n\n';
+
+      await file.writeAsString('$fileContent$deletionLog');
+    } catch (e) {
+      print('Error updating log after deletion: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,95 +172,63 @@ class _LoggerPageState extends State<LoggerPage> with WidgetsBindingObserver {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: BlocBuilder<CrudBloc, CrudState>(
-        builder: (context, state) {
-          return SafeArea(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/background.jpg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Column(
-                children: [
-                  SingleChildScrollView(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                    ),
-                  ),
-                  if (state is DisplayTodos && state.todo.isNotEmpty)
-                    loglistview(state)
-                  else
-                    Text(Message.Nologs),
-                ],
-              ),
-            ),
-          );
+      body: BlocListener<CrudBloc, CrudState>(
+        listener: (context, state) {
+          if (state is DisplayTodos && state.todo.isNotEmpty) {
+            logs = state.todo;
+            _saveLogsToFile(logs);
+          }
         },
-      ),
-    );
-  }
-
-  Expanded loglistview(DisplayTodos state) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: state.todo.length,
-        itemBuilder: (context, i) {
-          Todo currentTodo = state.todo[i];
-
-          return Card(
-            elevation: 10,
-            color: StatusColor.getColor(currentTodo.status),
-            child: ListTile(
-              title: Text(
-                currentTodo.title.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${(Message.userid)} : ${(currentTodo.userId!)}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '${(Message.Status)}: ${currentTodo.status}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '${(Message.OrderNumber)} : ${(currentTodo.id)}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    '${(Message.created)}: ${(currentTodo.createdTime)}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  if (currentTodo.completedDate != null)
-                    Text(
-                      '${(Message.expected)}: ${(currentTodo.completedDate!)}',
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
+        child: SafeArea(
+          child: FutureBuilder<List<Todo>>(
+            future: _readLogsFromFile(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                List<Todo> todos = snapshot.data ?? [];
+                return todos.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: todos.length,
+                        itemBuilder: (context, index) {
+                          Todo todo = todos[index];
+                          return Card(
+                            elevation: 3,
+                            margin: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    todo.title,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text('Created Date: ${todo.createdTime}'),
+                                  if (todo.completedDate != null)
+                                    Text(
+                                        'Completed Date: ${todo.completedDate}'),
+                                  Text('Status: ${todo.status}'),
+                                  SizedBox(height: 8),
+                                  // Add more details if needed
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Center(child: Text('No logs'));
+              }
+            },
+          ),
+        ),
       ),
     );
   }
